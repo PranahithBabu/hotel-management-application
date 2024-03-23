@@ -2,4 +2,4 @@ backend/.env
 
 backend/node_modules/
 
-backend/models/config.js
+backend/config.js
