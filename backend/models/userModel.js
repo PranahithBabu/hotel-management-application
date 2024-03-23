@@ -20,7 +20,6 @@ const userSchema = mongoose.Schema(
         },
         secretKey: {
             type: String,
-            required: true,
         },
         isAdmin: {
             type: Boolean,

@@ -25,15 +25,14 @@ app.post('/register', async(req,res) => {
                 message: 'Input all the fields to register'
             });
         }
-        if(secretKey && (secretKey !== process.env.SECRET_KEY)){
-            return res.status(400).send({
-                message: 'Invalid secret key'
-            });
-        }
         if(password !== confirmPassword){
             return res.status(400).send({
                 message: 'Passwords doesnot match'
             });
+        }
+        let isAdmin = false;
+        if(secretKey && (secretKey === process.env.SECRET_KEY)){
+            isAdmin = true;
         }
         const exist = await User.findOne({email});
         if(exist) {
@@ -42,7 +41,7 @@ app.post('/register', async(req,res) => {
             });
         }
         let newUser = new User({
-            name, email, password, confirmPassword
+            name, email, password, confirmPassword, isAdmin
         })
         const user = await User.create(newUser);
         return res.status(200).send(user);
@@ -54,14 +53,11 @@ app.post('/register', async(req,res) => {
 
 app.post('/login', async(req,res) => {
     try{
-        const {email, password, secretKey} = req.body;
+        const {email, password} = req.body;
         if(!email || !password){
             return res.status(400).send({
                 message: "Input all the fields to login"
             });
-        }
-        if(secretKey && secretKey){
-
         }
         const user = await User.findOne({email});
         if(!user){
@@ -74,50 +70,108 @@ app.post('/login', async(req,res) => {
                 message: "Invalid password"
             });
         }
-
-        // const role = getRole(user);
-
-        const token = jwt.sign({user : {id: user.id, email: user.email}}, process.env.JWT_SECRET, {expiresIn: '1h'});
-
-        // let redirectUrl;
-        // if (role === 'admin') {
-        //     redirectUrl = '/home/admin';
-        // } else {
-        //     redirectUrl = '/home/customer';
-        // }
-        // res.redirect(redirectUrl);
-        return res.json({token});
+        const isAdmin = user.isAdmin;
+        const token = jwt.sign({user : {id: user.id, email: user.email, isAdmin}}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        if(isAdmin){
+            return res.json({token, redirect: '/a/home', id: user.id});
+        }else{
+            return res.json({token, redirect: '/c/home', id: user.id});
+        }
     }catch(err){
         console.log(err.message);
         return res.status(500).send({message: err.message});
     }
 });
 
-app.get('/home/admin', verifyToken, async(req,res) => {
-    // const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+app.post('/a/home/:userId', verifyToken, async (req,res) => {
     try{
-        // if(userRole !== 'admin'){
-        //     return res.status(500).send({
-        //         message: "Not admin"
-        //     });
-        // }
-        let rooms = await Room.find();
-        return res.status(200).json(rooms);
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+            const roomExist = await Room.findOne({roomNumber});
+            if(roomExist){
+                return res.status(401).send({message: "Room Exists"});
+            }
+            const newRoom = new Room({
+                userId, roomNumber, roomType, roomPrice, roomAvailability
+            })
+            newRoom.save();
+            return res.status(200).send({message: "New Room Added" });
+        } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }   
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.get('/a/home/:userId', verifyToken, async(req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            let rooms = await Room.find();
+            return res.status(200).json({ rooms });
+        } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
     }catch(err){
         console.log(err.message);
         return res.status(500).send({message: err.message});
     }
 });
 
-app.get('/home/customer', verifyToken, async(req,res) => {
+app.put('/a/home/:userId', verifyToken, async (req,res) => {
     try{
-        // if(userRole !== 'customer'){
-        //     return res.status(500).send({
-        //         message: "Not customer"
-        //     });
-        // }
-        let rooms = await Room.find();
-        return res.status(200).json(rooms);
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            const {_id, roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+            const roomExist = await Room.findById(_id);
+            if(roomExist){
+                const updatedRoom = await Room.findByIdAndUpdate(_id, {roomPrice, roomAvailability});
+                updatedRoom.save();
+                return res.status(200).send({updatedRoom, message:"Room Updated Successfully"})
+            }else{
+                return res.status(404).send({message:"Room doesnot Exist"})
+            }
+        } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.delete('/a/home/:userId', verifyToken, async (req,res) => {
+    try {
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            const {_id} = req.body;
+            const roomExist = await Room.findById(_id);
+            if(roomExist){
+                const deletedRoom = await Room.findByIdAndDelete(_id);
+                return res.status(200).send({ deletedRoom, message: "Deleted Room Successfully" });
+            }else{
+                return res.status(403).send({ message: "Room doesnot Exist" });
+            }
+        } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.get('/c/home/:userId', verifyToken, async(req,res) => {
+    try{
+        const userId = req.params.userId;if (!req.user.isAdmin && userId === req.user.id) {
+            let rooms = await Room.find();
+            return res.status(200).json({ rooms });
+        } else {
+            return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
+        }
     }catch(err){
         console.log(err.message);
         return res.status(500).send({message: err.message});

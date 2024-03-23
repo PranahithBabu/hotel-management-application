@@ -7,13 +7,13 @@ const tomorrow = () => {
 }
 
 const reservationSchema = mongoose.Schema(
-    {
+    {   
         reservationID:{
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             default: mongoose.Types.ObjectId
         },
-        userID: {
+        userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
