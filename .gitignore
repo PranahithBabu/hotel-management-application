@@ -1,5 +1,5 @@
 backend/.env
 
-backend/node_modules/
-
 backend/config.js
+
+backend/node_modules/
