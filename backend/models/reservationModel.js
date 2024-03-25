@@ -6,13 +6,8 @@ const tomorrow = () => {
     return date;
 }
 
-const reservationSchema = mongoose.Schema(
+const reservationSchema = new mongoose.Schema(
     {   
-        reservationID:{
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            default: mongoose.Types.ObjectId
-        },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
@@ -37,8 +32,7 @@ const reservationSchema = mongoose.Schema(
         status: {
             type: String,
             enum: ["pending","approved","rejected","canceled"],
-            default: "pending",
-            required: true,
+            default: "pending"
         },
         price: {
             type: Number,
