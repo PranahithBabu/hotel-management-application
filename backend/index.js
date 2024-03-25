@@ -264,6 +264,56 @@ app.get('/a/dashboard/:userId', verifyToken, async (req,res) => {
     }
 })
 
+app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            const {_id, roomNumber, roomType, roomPrice, startDate, endDate, status} = req.body;
+            const reservationExist = await Reservation.findById(_id);
+            if(reservationExist){
+                const updatedReservation = await Reservation.findByIdAndUpdate(_id, {
+                    userId: userId,
+                    ...(roomNumber && { roomNumber }),
+                    ...(roomType && { roomType }),
+                    ...(roomPrice && { price: roomPrice }),
+                    ...(startDate && { startDate }),
+                    ...(endDate && { endDate }),
+                    status: status
+                })
+                updatedReservation.save();
+                return res.status(403).send({updatedReservation, message: "Reservation updated successfully" });
+            }else{
+                return res.status(403).send({ message: "Reservation doesnot exist. Create a new one!" });
+            }
+        } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.delete('/a/dashboard/:userId', verifyToken, async (req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (req.user.isAdmin && userId === req.user.id) {
+            const {_id} = req.body;
+            const reservationExist = await Reservation.findById(_id);
+            if(reservationExist){
+                let deletedReservation = await Reservation.findByIdAndDelete(_id);
+                return res.status(200).json({ deletedReservation, message: "Deleted reservation successfully" });
+            }else{
+                return res.status(404).json({ message: "Reservation doesnot exist. Or failed to delete" });
+            }
+            } else {
+            return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
 
 try{
     mongoose
