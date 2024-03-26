@@ -199,7 +199,6 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                     endDate: endDate,
                     price: roomExist.roomPrice
                 })
-                console.log(newReservation);
                 await newReservation.save();
                 const updatedAvailability = await Room.findByIdAndUpdate(_id, {roomAvailability: false});
                 updatedAvailability.save();
@@ -270,20 +269,20 @@ app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
     try{
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const {_id, roomNumber, roomType, roomPrice, startDate, endDate, status} = req.body;
+            const {_id, startDate, endDate, status} = req.body;
+            if(status && !(status === "pending" || status === "approved" || status === "rejected" || status === "canceled" )){
+                return res.status(403).send({message: "Invalid status message"});
+            }
             const reservationExist = await Reservation.findById(_id);
             if(reservationExist){
                 const updatedReservation = await Reservation.findByIdAndUpdate(_id, {
                     userId: userId,
-                    ...(roomNumber && { roomNumber }),
-                    ...(roomType && { roomType }),
-                    ...(roomPrice && { price: roomPrice }),
                     ...(startDate && { startDate }),
                     ...(endDate && { endDate }),
                     status: status
                 })
-                updatedReservation.save();
-                return res.status(403).send({updatedReservation, message: "Reservation updated successfully" });
+                await updatedReservation.save();
+                return res.status(200).send({updatedReservation, message: "Reservation updated successfully" });
             }else{
                 return res.status(403).send({ message: "Reservation doesnot exist. Create a new one!" });
             }
@@ -302,22 +301,81 @@ app.delete('/a/dashboard/:userId', verifyToken, async (req,res) => {
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id} = req.body;
             const reservationExist = await Reservation.findById(_id);
-            // console.log("NUMBER: ", reservationExist);
             const room = await Room.findOne({roomNumber: reservationExist.roomNumber});
-            // console.log("ROOM: ",room.roomAvailability);
-            // console.log("DELETE: ", reservationExist);
             if(reservationExist){
-                // console.log("TOP");
                 let deletedReservation = await Reservation.findByIdAndDelete(_id);
-                // console.log("BOTTOM")
                 room.roomAvailability = true;
-                room.save();
+                await room.save();
                 return res.status(200).json({ deletedReservation, message: "Deleted reservation successfully" });
             }else{
                 return res.status(404).json({ message: "Reservation doesnot exist. Or failed to delete" });
             }
         } else {
         return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+// Customer Dashboard Page Requests
+app.get('/c/dashboard/:userId', verifyToken, async (req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (!req.user.isAdmin && userId === req.user.id) {
+            let reservations = await Reservation.find({userId: userId});
+            return res.status(200).json({ reservations });
+        } else {
+            return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.put('/c/dashboard/:userId', verifyToken, async (req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (!req.user.isAdmin && userId === req.user.id) {
+            const {_id, startDate, endDate} = req.body;
+            const reservationExist = await Reservation.findById(_id);
+            if(!reservationExist){
+                return res.status(403).send({ message: "Reservation doesnot exist. Plese make an reservation." });
+            }
+            const updatedReservation = await Reservation.findByIdAndUpdate(_id, {
+                userId: userId,
+                ...(startDate && {startDate}),
+                ...(endDate && {endDate})    
+            })
+            await updatedReservation.save();
+            return res.status(200).send({ message: "Reservation updated successfully" });
+        } else {
+            return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
+        }
+    }catch(err){
+        console.log(err.message);
+        return res.status(500).send({message: err.message});
+    }
+})
+
+app.delete('/c/dashboard/:userId', verifyToken, async (req,res) => {
+    try{
+        const userId = req.params.userId;
+        if (!req.user.isAdmin && userId === req.user.id) {
+            const {_id} = req.body;
+            const reservationExist = await Reservation.findById(_id);
+            const room = await Room.findOne({roomNumber: reservationExist.roomNumber});
+            if(!reservationExist) {
+                return res.status(403).send({message: "Reservation doesnot exist"});
+            }
+            await Reservation.findByIdAndDelete(_id);
+            room.roomAvailability = true;
+            await room.save();
+            return res.status(200).send({message: "Deleted reservation successfully."})
+        } else {
+            return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
         }
     }catch(err){
         console.log(err.message);
