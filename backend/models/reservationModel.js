@@ -44,4 +44,19 @@ const reservationSchema = new mongoose.Schema(
     }
 );
 
+reservationSchema.pre('save', async function(next) {
+    if (!this.roomId) {
+        try {
+            const Room = mongoose.model('Room');
+            const room = await Room.findOne().select('_id').exec();
+            this.roomId = room._id;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+});
+
 export const Reservation = mongoose.model('Reservation', reservationSchema);
