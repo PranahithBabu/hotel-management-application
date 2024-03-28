@@ -37,6 +37,12 @@ const reservationSchema = new mongoose.Schema(
         price: {
             type: Number,
             required: true,
+        },
+        bookedStartDate: {
+            type: Date
+        },
+        bookedEndDate: {
+            type: Date
         }
     },
     {

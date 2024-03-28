@@ -130,12 +130,12 @@ app.put('/a/home/:userId', verifyToken, async (req,res) => {
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id, roomNumber, roomType, roomPrice, roomAvailability} = req.body;
             const roomExist = await Room.findById(_id);
-            if(roomExist){
+            if(!roomExist){
+                return res.status(404).send({message:"Room doesnot Exist"});
+            }else{
                 const updatedRoom = await Room.findByIdAndUpdate(_id, {roomPrice, roomAvailability});
                 updatedRoom.save();
-                return res.status(200).send({updatedRoom, message:"Room Updated Successfully"})
-            }else{
-                return res.status(404).send({message:"Room doesnot Exist"})
+                return res.status(200).send({updatedRoom, message:"Room Updated Successfully"});
             }
         } else {
             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
@@ -282,6 +282,17 @@ app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
                     status: status
                 })
                 await updatedReservation.save();
+
+                // Getting DATE intact to block booked dates with available one's (In progress)
+                if(status && status === "approved"){
+                    const updatedBooking = await Reservation.findByIdAndUpdate(_id, {
+                        bookedStartDate: reservationExist.startDate,
+                        bookedEndDate: reservationExist.endDate
+                    });
+                    await updatedBooking.save();
+                    return res.status(200).send({updatedBooking, message: "Reservation updated successfully with BOOKING" });
+                }
+
                 return res.status(200).send({updatedReservation, message: "Reservation updated successfully" });
             }else{
                 return res.status(403).send({ message: "Reservation doesnot exist. Create a new one!" });
