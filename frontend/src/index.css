@@ -57,3 +57,8 @@
 .question-mark-container:hover .tooltip {
     visibility: visible;
 }
+
+.invalid {
+    border: 2px solid red;
+  }
+  

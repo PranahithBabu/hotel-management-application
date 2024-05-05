@@ -56,7 +56,7 @@ app.post('/register', async(req,res) => {
         const user = await User.create(newUser);
         return res.status(200).send(user);
     }catch(err){
-        console.log(err.message);
+        console.log("HERE: ",err.message);
         return res.status(500).send({message: err.message});
     }
 });

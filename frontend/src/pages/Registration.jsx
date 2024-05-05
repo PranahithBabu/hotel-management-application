@@ -1,40 +1,87 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const Registration = () => {
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    secretKey: ""
+  })
+  const [auth, setAuth] = useState(false);
+  const navigate = useNavigate();
+  const changeHandler = e => {
+    setData({...data,[e.target.name]:e.target.value})
+  }
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    console.log(data);
+    var check = false;
+    if (data.secretKey !== "") {
+        if (data.secretKey === "adminlogin") {
+            console.log("Correct key");
+            check = true;
+        } else {
+            const isConfirmed = window.confirm("It is an incorrect key. Do you wish to continue as customer?");
+            if (isConfirmed) {
+                check = true;
+            } else {
+                console.log("Registration canceled by user");
+                // document.getElementById('secretkey').classList.add('invalid');
+            }
+        }
+    }else{
+      check = true;
+    }
+    if(check){
+        try {
+            await axios.post('http://localhost:5000/register', {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+                secretKey: data.secretKey
+            }).then(
+              res => {console.log(res); setAuth(true); navigate('/login', { state: { success: true } });}
+            ).catch(error=>{
+              if (error.response) {
+                alert(error.response.data.message);
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
+                alert('Error', error.message);
+              }
+              console.log(error.config);
+            })
+          }catch {
+            console.log(error);
+          }
+        }
+      }
+  if(auth) {
+    return <Navigate to='/login' />
+  }
   return (
     <div>
       <Header />
-      <div className='form'>
-      <div class="mb-3">
-          <label for="username" class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" placeholder="Input username" />
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="email" placeholder="Input email" />
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" id="password" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Input password" />
-        </div>
-        <div class="mb-3">
-          <label for="confirmpassword" class="form-label">Confirm Password</label>
-          <input type="password" id="confirmpassword" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Confirm password" />
-        </div>
-        <div class="mb-3">
-          <label for="secretkey" class="form-label">Secret Key</label>
-          <div class="question-mark-container">
-            <input type="password" id="secretkey" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Input Secret key" />
-            <span class="question-mark">?</span>
-            <div class="tooltip" role="tooltip">For Admin Login</div>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
       <div>
+        <form onSubmit={submitHandler} className='form' action='register-account.html' autoComplete='off'>
+          <div className='form-group'><input type='text' placeholder='Username' name='name' onChange={changeHandler} /></div>
+          <div className='form-group'><input type='email' placeholder='Email Address' name='email' onChange={changeHandler} /></div>
+          <div className='form-group'><input type='password' placeholder='Password' name='password' onChange={changeHandler} /></div>
+          <div className='form-group'><input type='password' placeholder='Confirm Password' name='confirmPassword' onChange={changeHandler} /></div>
+          <div className='question-mark-container'>
+            <input type="password" id="secretkey" name='secretKey' className="form-control" aria-describedby="passwordHelpBlock" 
+            placeholder="Secret key" onChange={changeHandler}/>
+            <span className='question-mark'>?</span>
+            <div className='tooltip' role="tooltip">For Admin Login</div>
+          </div>
+          <div className='form-group'><input className='btn btn-primary' type='submit' value='Register'/></div>
+        </form>
         <br/>
         Existing customer? Click here to Login
         <Link to='/login'><button className='btn btn-success'>Login</button></Link> &nbsp;
