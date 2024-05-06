@@ -1,10 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const Registration = () => {
+  const location = useLocation();
+  const currentPage = location.pathname.split('/')[1];
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -67,7 +69,7 @@ const Registration = () => {
   }
   return (
     <div>
-      <Header />
+      <Header currentPage={currentPage} />
       <div>
         <form onSubmit={submitHandler} className='form' action='register-account.html' autoComplete='off'>
           <div className='form-group'><input type='text' placeholder='Username' name='name' onChange={changeHandler} /></div>

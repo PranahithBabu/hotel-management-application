@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 
 const Login = () => {
+  const location = useLocation();
+  const currentPage = location.pathname.split('/')[1];
   const [data, setData] = useState({
     email: "",
     password: ""
@@ -44,7 +46,7 @@ const Login = () => {
   }
   return (
     <div>
-      <Header />
+      <Header currentPage={currentPage} />
       <div>
         <form onSubmit={submitHandler} className='form' action='login-account.html' autoComplete='off'>
           <div className='form-group'><input type='email' placeholder='Email Address' name='email' onChange={changeHandler} /></div>
