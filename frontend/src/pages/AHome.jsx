@@ -6,8 +6,9 @@ import axios from 'axios';
 
 const AHome = () => {
   const location = useLocation();
-  const currentPage = location.pathname.split('/')[2];
+  // const currentPage = location.pathname.split('/')[2];
   const currentURL = location.pathname;
+  console.log(currentURL);
   const [data, setData] = useState([]);
   useEffect(() => {
     axios.get(`http://localhost:5000${currentURL}`,{
@@ -28,7 +29,7 @@ const AHome = () => {
   },[data])
   return (
     <div>
-      <Header currentPage={currentPage} />
+      <Header currentPage={currentURL} />
       <div>
         Ahome
       </div>
