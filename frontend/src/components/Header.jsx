@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
+import {Link} from 'react-router-dom'
 
 const Header = ({currentPage}) => {
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     console.log(isMenuOpen);
@@ -9,6 +9,7 @@ const Header = ({currentPage}) => {
     console.log(isMenuOpen);
   }
   console.log("It is: ",currentPage.replace('home','dashboard'));
+
   return (
     <div className="header">
       <h1>Hotel Booking</h1>
@@ -28,9 +29,7 @@ const Header = ({currentPage}) => {
               ): currentPage.includes("dashboard") ? (
                 <li><a href={currentPage.replace('dashboard','home')}>Home</a></li>
                 ): null}
-                {/* Have an onClick event to remove the token and 
-                then navigate user to the login page */}
-              <li><a href="/logout">Logout</a></li>
+              <li onClick={()=>localStorage.removeItem('token')}><Link to='/login'>Logout</Link></li>
             </ul>
           </div>
         </div>

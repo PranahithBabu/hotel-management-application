@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CHome = () => {
@@ -26,6 +26,12 @@ const CHome = () => {
     console.log(error.config);
   })
   },[data])
+
+  if(!localStorage.getItem('token')) {
+    alert('Login to get into the aplication.')
+    return <Navigate to='/login' />
+  }
+
   return (
     <div>
       <Header currentPage={currentURL} />
