@@ -4,11 +4,11 @@ import {Link} from 'react-router-dom'
 const Header = ({currentPage}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
-    console.log(isMenuOpen);
+    // console.log(isMenuOpen);
     setIsMenuOpen(!isMenuOpen);
-    console.log(isMenuOpen);
+    // console.log(isMenuOpen);
   }
-  console.log("It is: ",currentPage.replace('home','dashboard'));
+  // console.log("It is: ",currentPage.replace('home','dashboard'));
 
   return (
     <div className="header">

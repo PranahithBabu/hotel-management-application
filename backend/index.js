@@ -13,14 +13,28 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// app.use(cors());
-app.use(
-    cors({
-        origin: 'http://localhost:5173',
-        method: ['GET','POST','PUT','DELETE'],
-        allowedHeaders: ['Content-Type']
-    })
-)
+// const cors = require('cors')
+// const cors = require('cors');
+
+app.use(cors({}));
+// app.use(
+//     cors({
+//         origin: 'http://localhost:5173',
+//         method: ['GET','POST','PUT','DELETE'],
+//         allowedHeaders: ['Content-Type']
+//     })
+// )
+
+// const corsOptions = {
+//     origin: 'http://localhost:5173', // Allow only the frontend to access
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed methods
+//     credentials: true, // Allow cookies to be sent with requests
+//     optionsSuccessStatus: 204 // Some legacy browsers choke on 204
+//   };
+  
+// app.use(cors(corsOptions));
+
+// app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req,res) => {
     res.status(200).send('In GET');
@@ -82,7 +96,9 @@ app.post('/login', async(req,res) => {
             });
         }
         const isAdmin = user.isAdmin;
-        const token = jwt.sign({user : {id: user.id, email: user.email, isAdmin}}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        const token = jwt.sign({user : {id: user.id, email: user.email, isAdmin}}, process.env.JWT_SECRET, 
+            // {expiresIn: '1h'}
+        );
         if(isAdmin){
             return res.json({token, redirect: '/a/home', id: user.id});
         }else{
@@ -138,11 +154,14 @@ app.put('/a/home/:userId', verifyToken, async (req,res) => {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id, roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+            // const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
             const roomExist = await Room.findById(_id);
+            // const roomExist = await Room.findOne(roomNumber);
             if(!roomExist){
                 return res.status(404).send({message:"Room doesnot Exist"});
             }else{
-                const updatedRoom = await Room.findByIdAndUpdate(_id, {roomPrice, roomAvailability});
+                const updatedRoom = await Room.findByIdAndUpdate(_id, {roomType, roomPrice, roomAvailability});
+                // const updatedRoom = await Room.findByIdAndUpdate(roomNumber, {roomType, roomPrice, roomAvailability});
                 updatedRoom.save();
                 return res.status(200).send({updatedRoom, message:"Room Updated Successfully"});
             }
@@ -161,7 +180,7 @@ app.delete('/a/home/:userId', verifyToken, async (req,res) => {
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id} = req.body;
             const roomExist = await Room.findById(_id);
-            console.log("IN DELETE: ", roomExist.roomPrice);
+            // console.log("IN DELETE: ", roomExist.roomPrice);
             if(roomExist){
                 const deletedRoom = await Room.findByIdAndDelete(_id);
                 return res.status(200).send({ deletedRoom, message: "Deleted Room Successfully" });

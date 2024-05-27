@@ -132,3 +132,38 @@
     text-decoration: underline;
   }
   
+
+  /* New */
+
+  .form-a-home {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .form-group-a-home {
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 2px;
+  }
+  
+  .form-group-a-home label {
+    margin-left: 10px
+  }
+  
+  .form-group-a-home input, .form-group-a-home select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid black;
+  }
+  
+  .form-group-a-home input[type='checkbox'] {
+    width: auto;
+    margin-left: 0;
+  }
+  
+  .btn-info {
+    flex: 1 1 100%;
+  }
+  

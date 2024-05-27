@@ -12,9 +12,9 @@ const CHome = () => {
   useEffect(() => {
     axios.get(`http://localhost:5000${currentURL}`,{
       headers: {
-        'token': localStorage.getItem('token')
+        'Authorization': localStorage.getItem('token')
       }
-    }).then(res => {setData(res.data); console.log(data)}
+    }).then(res => {console.log("Response: ",res); setData(res.data); console.log(data)}
   ).catch(error => {
     if (error.response) {
       alert(error.response.data);

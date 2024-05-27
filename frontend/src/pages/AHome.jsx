@@ -6,24 +6,32 @@ import axios from 'axios';
 
 const AHome = () => {
   const location = useLocation();
-  // const currentPage = location.pathname.split('/')[2];
   const currentURL = location.pathname;
-  console.log(currentURL);
   const [data, setData] = useState([]);
-  const [item, setItem] = useState({
+  const [room, setRoom] = useState({
     roomNumber: '',
     roomType: '',
     roomPrice: '',
-    roomAvailability: ''
+    roomAvailability: true
+  })
+  const [editRoom, setEditRoom] = useState({
+    roomNumber: '',
+    roomType: '',
+    roomPrice: '',
+    roomAvailability: true
   })
   const [search, setSearch] = useState("")
   const [filteredData, setFilteredData] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editId, setEditId] = useState(null);
   useEffect(() => {
     axios.get(`http://localhost:5000${currentURL}`,{
       headers: {
-        'token': localStorage.getItem('token')
+        'Authorization': localStorage.getItem('token')
       }
-    }).then(res => {setData(res.data); console.log(data)}
+    }).then(res => {
+      setData(res.data.rooms);
+    }
     ).catch(error=>{
       if (error.response) {
         alert(error.response.data);
@@ -34,34 +42,87 @@ const AHome = () => {
       }
       console.log(error.config);
     })
-  },[data])
+  }, [data])
 
   if(!localStorage.getItem('token')) {
     alert('Login to get into the aplication.')
     return <Navigate to='/login' />
   }
-  useEffect(() => {
-    const filtered = data.filter((x) => x.itemname && x.itemname.toLowerCase().includes(search.toLowerCase()));
-    setFilteredData(filtered)
-  },[search,data])
+  // useEffect(() => {
+  //   const filtered = data.filter((x) => x.itemname && x.itemname.toLowerCase().includes(search.toLowerCase()));
+  //   setFilteredData(filtered)
+  // },[search,data])
 
   const changeHandler = e => {
-    setItem({...item, [e.target.name]:e.target.value})
-  }
+    const { name, value, type, checked } = e.target;
+    setRoom(prevRoom => ({
+      ...prevRoom,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
   const submitHandler = e => {
     e.preventDefault();
-    console.log(item);
-    axios.post(`http://localhost:5000${currentURL}`, item, {
+    if(isEdit) {
+      axios.put(`http://localhost:5000${currentURL}`, room, {
+        headers: {
+          'Authorization': localStorage.getItem('token')
+        }
+      }).then(res => {
+        setData(data.map(item => (item._id === editId ? res.data : item)));
+        resetForm();
+      }).catch(error => {
+        console.error(error);
+        alert('Error updating room');
+      });
+    }
+    else {
+      axios.post(`http://localhost:5000${currentURL}`, room, {
+        headers: {
+          'Authorization': localStorage.getItem('token')
+        }
+      }).then(
+        res => {
+          setData([...data, res]);
+          setRoom({roomNumber: '', roomType:'', roomPrice: '', roomAvailability: true});
+        }
+      ).catch(error=>{
+        if (error.response) {
+          alert(error.response.data);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          alert('Error', error.message);
+        }
+        console.log(error.config);
+      })
+    }
+  }
+
+
+  const editRoomBtn = (room) => {
+    setRoom(room);
+    setIsEdit(true);
+    setEditId(room._id);
+  }
+
+  const resetForm = () => {
+    setRoom({
+      roomNumber: '',
+      roomType: '',
+      roomPrice: '',
+      roomAvailability: true
+    });
+    setIsEdit(false);
+    setEditId(null);
+  };
+
+  const deleteRoomBtn = (_id) => {
+    axios.delete(`http://localhost:5000${currentURL}`,{data:{_id:_id},
       headers: {
-        'token': localStorage.getItem('token'),
-        'Content-Type': 'application/json'
+        'Authorization': localStorage.getItem('token')
       }
-    }).then(
-      res => {
-        setData([...data, res]);
-        setItem({roomNumber: '', roomType:'', roomPrice: '', roomAvailability: ''});
-      }
+    }).then(res => console.log(res)
     ).catch(error=>{
       if (error.response) {
         alert(error.response.data);
@@ -73,7 +134,7 @@ const AHome = () => {
       console.log(error.config);
     })
   }
-
+  
   return (
     <div>
       <Header currentPage={currentURL} />
@@ -82,32 +143,58 @@ const AHome = () => {
       <div className='container'>
         <div className='fixed-element'>
           <div>
-            <form onSubmit={submitHandler} className='form' action='items.html' autoComplete='off'>
-              <div className='form-group'><input type='text' placeholder='Room Number' value={item.roomNumber} name='roomnumber' onChange={changeHandler} /></div>
-              <div className='form-group'><input type='text' placeholder='Room Type' name='roomtype' value={item.roomType} onChange={changeHandler} /></div>
-              <div className='form-group'><input type='text' placeholder='Room Price' name='roomprice' value={item.roomPrice} onChange={changeHandler} /></div>
-              <div className='form-group'><input type='text' placeholder='Room Availability' name='roomavailability' value={item.roomAvailability} onChange={changeHandler} /></div>
-              <div className='form-group'><input className='btn btn-info' type='submit' value='Add Room' /></div>
+            <form onSubmit={submitHandler} className='form-a-home' autoComplete='off'>
+              <div className='form-group-a-home'>
+                <input type='text' placeholder='Room Number' value={room.roomNumber} name='roomNumber' onChange={changeHandler} />
+              </div>
+              <div className='form-group-a-home'>
+                <select name='roomType' value={room.roomType} onChange={changeHandler}>
+                  <option value='' disabled>Select Room Type</option>
+                  <option value='Single'>Single</option>
+                  <option value='Double'>Double</option>
+                  <option value='Suite'>Suite</option>
+                </select>
+              </div>
+              <div className='form-group-a-home'>
+                <input type='text' placeholder='Room Price' name='roomPrice' value={room.roomPrice} onChange={changeHandler} />
+              </div>
+              <div className='form-group-a-home'>
+                <label>
+                  <input type='checkbox' name='roomAvailability' checked={room.roomAvailability} onChange={changeHandler} />
+                  Room Availability
+                </label>
+              </div>
+              <div className='form-group-a-home'>
+                {isEdit? 
+                  <input className='btn btn-warning' type='submit' value='Edit Room' />
+                  :
+                  <input className='btn btn-info' type='submit' value='Add Room' />
+                }
+              </div>
             </form>
+            <br/>
           </div>
-            <div className='row'>
-              {filteredData.map(newitem => 
-                <div className='col-md-4' key={newitem._id}>
-                  <div class="card" style={{width: "100%"}}>
-                    <h5 class="card-header">{newitem.roomNumber}</h5>
-                    <div class="card-body">
-                      <ul class="list-group">
-                        <li class="list-group-item">Room Type: {newitem.roomType}</li>
-                        <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
-                        <li class="list-group-item">Room Availability: {newitem.roomAvailability}</li>
-                      </ul> <br/>
-                      {/* <button className="btn btn-danger" onClick={()=>deleteItemBtn(newitem._id)}>Delete</button> &nbsp; */}
-                      {/* <button className='btn btn-success' onClick={()=>checkinBtn(newitem._id, newitem.calorie, newitem.protein)}>Check In</button> */}
-                    </div>
-                  </div> <br/>
-                </div>
-              )}
-            </div>
+
+
+          <div className='row'>
+            {data.map(newitem => 
+              <div className='col-md-4' key={newitem._id}>
+                <div class="card" style={{width: "100%", borderColor: newitem.roomAvailability ? "green": "grey", borderWidth: "5px"}}>
+                  <h5 class="card-header" style={{color: newitem.roomAvailability ? "black": "grey"}}>{newitem.roomNumber}</h5>
+                  <div class="card-body">
+                    <ul class="list-group">
+                      <li class="list-group-item">Room Type: {newitem.roomType}</li>
+                      <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
+                      {/* Add booking date later */}
+                    </ul> <br/>
+                    <button className="btn btn-danger" onClick={()=>deleteRoomBtn(newitem._id)}>Delete Room</button> &nbsp;
+                    <button className='btn btn-success' onClick={()=>editRoomBtn(newitem)}>Edit Room</button>
+                  </div>
+                </div> <br/>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
       </section>
