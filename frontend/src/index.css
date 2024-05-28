@@ -167,3 +167,171 @@
     flex: 1 1 100%;
   }
   
+  /* Calendar */
+
+  /* Calendar container */
+.react-calendar {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation buttons and labels */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.react-calendar__navigation button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.react-calendar__navigation button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Calendar month and days */
+.react-calendar__month-view__weekdays {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  text-align: center;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+}
+
+/* Selected date */
+.react-calendar__tile--active {
+  background-color: #1890ff;
+  color: white;
+  border-radius: 4px;
+}
+
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background-color: #40a9ff;
+}
+
+/* Disabled dates */
+.react-calendar__tile--now {
+  background-color: #fffb8f;
+  border-radius: 4px;
+}
+
+/* Customizing the calendar header */
+.react-calendar__navigation__label {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Adjusting the overall font and spacing */
+.react-calendar__tile {
+  font-family: 'Arial', sans-serif;
+  font-size: 0.9em;
+}
+
+/* Container to hold the calendar and the cards */
+.main-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to the next line */
+}
+
+/* Fixed calendar container */
+.calendar-container {
+  position: fixed;
+  top: 10%;
+  left: 20px;
+  width: 300px;
+  max-width: 100%;
+}
+
+/* Cards container with margin to the left to accommodate the fixed calendar */
+.cards-container {
+  margin-left: 350px; /* Adjust this value according to the width of your calendar and the left margin */
+  padding: 20px;
+  width: calc(100% - 350px); /* Ensure the cards take the remaining width */
+}
+
+/* Card styling */
+.card {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+  }
+  
+  .calendar-container {
+    position: static; /* Remove fixed positioning */
+    margin-bottom: 20px; /* Add some space below the calendar */
+  }
+  
+  .cards-container {
+    margin-left: 0;
+    width: 100%;
+    padding: 0 20px; /* Adjust padding for smaller screens */
+  }
+}
+
+/* Admin dashboard table */
+
+.reservations-container {
+  padding: 20px;
+}
+
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.reservations-table th,
+.reservations-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.reservations-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.reservations-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.reservations-table tr:hover {
+  background-color: #ddd;
+}

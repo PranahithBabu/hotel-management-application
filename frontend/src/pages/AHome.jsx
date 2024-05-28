@@ -168,7 +168,7 @@ const AHome = () => {
                 {isEdit? 
                   <input className='btn btn-warning' type='submit' value='Edit Room' />
                   :
-                  <input className='btn btn-info' type='submit' value='Add Room' />
+                  <input className='btn btn-primary' type='submit' value='Add Room' />
                 }
               </div>
             </form>
@@ -185,10 +185,9 @@ const AHome = () => {
                     <ul class="list-group">
                       <li class="list-group-item">Room Type: {newitem.roomType}</li>
                       <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
-                      {/* Add booking date later */}
                     </ul> <br/>
                     <button className="btn btn-danger" onClick={()=>deleteRoomBtn(newitem._id)}>Delete Room</button> &nbsp;
-                    <button className='btn btn-success' onClick={()=>editRoomBtn(newitem)}>Edit Room</button>
+                    <button className='btn btn-warning' onClick={()=>editRoomBtn(newitem)}>Edit Room</button>
                   </div>
                 </div> <br/>
               </div>
