@@ -29,6 +29,12 @@
     width: 100%;
 }
 
+.heading {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
 .main {
     text-align: center;
 }
@@ -162,6 +168,10 @@
     width: auto;
     margin-left: 0;
   }
+
+  /* .btn {
+    width: auto;
+  } */
   
   .btn-info {
     flex: 1 1 100%;
@@ -334,4 +344,66 @@
 
 .reservations-table tr:hover {
   background-color: #ddd;
+}
+
+
+/* Admin Dashboard Pop-up styling */
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.form-group-a-dashboard {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  margin: 5px 0px;
+  padding: 5px 0px;
+}
+
+.form-group-a-dashboard label {
+  color: blue;
+  margin-top: 2px;
+  margin-bottom: -10px;
+}
+
+.form-group-a-dashboard input, .form-group-a-dashboard select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid blue;
 }

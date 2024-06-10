@@ -248,8 +248,9 @@ app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
     try{
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const {roomNumber, roomType, roomPrice, startDate, endDate} = req.body;
+            const {roomNumber, startDate, endDate} = req.body;
             const bookingExist = await Room.findOne({roomNumber});
+            console.log(bookingExist);
             if(!bookingExist){
                 return res.status(403).send({message: "Room doesnot exist"});
             }
@@ -257,10 +258,10 @@ app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
                 const newReservation = new Reservation({
                     userId: userId,
                     roomNumber: roomNumber,
-                    roomType: roomType,
+                    roomType: bookingExist.roomType,
                     startDate: startDate,
                     endDate: endDate,
-                    price: roomPrice
+                    price: bookingExist.roomPrice
                 })
                 await newReservation.save();
                 const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
@@ -283,7 +284,8 @@ app.get('/a/dashboard/:userId', verifyToken, async (req,res) => {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
             let reservations = await Reservation.find();
-            return res.status(200).json({ reservations });
+            let rooms = await Room.find();
+            return res.status(200).json({ reservations, rooms});
         } else {
             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
         }

@@ -24,6 +24,13 @@ const AHome = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [activateBtn, setActivateBtn] = useState(false);
+
+  useEffect(() => {
+    const { roomNumber, roomType, roomPrice } = room;
+    setActivateBtn(roomNumber !== '' && roomType !== '' && roomPrice !== '');
+  }, [room]);
+
   useEffect(() => {
     axios.get(`http://localhost:5000${currentURL}`,{
       headers: {
@@ -99,7 +106,6 @@ const AHome = () => {
     }
   }
 
-
   const editRoomBtn = (room) => {
     setRoom(room);
     setIsEdit(true);
@@ -135,6 +141,10 @@ const AHome = () => {
     })
   }
   
+  const cancelEditBtn = () => {
+    window.location.reload();
+  }
+
   return (
     <div>
       <Header currentPage={currentURL} />
@@ -165,10 +175,13 @@ const AHome = () => {
                 </label>
               </div>
               <div className='form-group-a-home'>
-                {isEdit? 
-                  <input className='btn btn-warning' type='submit' value='Edit Room' />
+                {isEdit?
+                  <div className='btn'>
+                    <input className='btn btn-danger' type='submit' value='Cancel Editing' onClick={()=>cancelEditBtn()} /> &nbsp;
+                    <input className='btn btn-warning' type='submit' value='Edit Room' />
+                  </div>
                   :
-                  <input className='btn btn-primary' type='submit' value='Add Room' />
+                  <input className='btn btn-primary' type='submit' value='Add Room' disabled = {!activateBtn} />
                 }
               </div>
             </form>
