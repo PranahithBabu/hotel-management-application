@@ -309,7 +309,7 @@ app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
                     userId: userId,
                     ...(startDate && { startDate }),
                     ...(endDate && { endDate }),
-                    status: status
+                    ...(status && { status })
                 })
                 await updatedReservation.save();
 
