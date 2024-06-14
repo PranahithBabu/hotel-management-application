@@ -391,7 +391,7 @@ app.put('/c/dashboard/:userId', verifyToken, async (req,res) => {
                 ...(endDate && {endDate})    
             })
             await updatedReservation.save();
-            return res.status(200).send({ message: "Reservation updated successfully" });
+            return res.status(200).send({ message: "Reservation updated successfully", updatedReservation });
         } else {
             return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
         }
