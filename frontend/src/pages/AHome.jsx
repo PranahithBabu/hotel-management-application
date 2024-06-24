@@ -12,13 +12,13 @@ const AHome = () => {
     roomNumber: '',
     roomType: '',
     roomPrice: '',
-    roomAvailability: true
+    roomMaintenance: false
   })
   const [editRoom, setEditRoom] = useState({
     roomNumber: '',
     roomType: '',
     roomPrice: '',
-    roomAvailability: true
+    roomMaintenance: false
   })
   const [search, setSearch] = useState("")
   const [filteredData, setFilteredData] = useState([]);
@@ -55,10 +55,6 @@ const AHome = () => {
     alert('Login to get into the aplication.')
     return <Navigate to='/login' />
   }
-  // useEffect(() => {
-  //   const filtered = data.filter((x) => x.itemname && x.itemname.toLowerCase().includes(search.toLowerCase()));
-  //   setFilteredData(filtered)
-  // },[search,data])
 
   const changeHandler = e => {
     const { name, value, type, checked } = e.target;
@@ -91,7 +87,7 @@ const AHome = () => {
       }).then(
         res => {
           setData([...data, res]);
-          setRoom({roomNumber: '', roomType:'', roomPrice: '', roomAvailability: true});
+          setRoom({roomNumber: '', roomType:'', roomPrice: '', roomMaintenance: false});
         }
       ).catch(error=>{
         if (error.response) {
@@ -117,7 +113,7 @@ const AHome = () => {
       roomNumber: '',
       roomType: '',
       roomPrice: '',
-      roomAvailability: true
+      roomMaintenance: false
     });
     setIsEdit(false);
     setEditId(null);
@@ -170,8 +166,8 @@ const AHome = () => {
               </div>
               <div className='form-group-a-home'>
                 <label>
-                  <input type='checkbox' name='roomAvailability' checked={room.roomAvailability} onChange={changeHandler} />
-                  Room Availability
+                  <input type='checkbox' name='roomMaintenance' checked={room.roomMaintenance} onChange={changeHandler} />
+                  Room Maintenance
                 </label>
               </div>
               <div className='form-group-a-home'>
@@ -192,8 +188,8 @@ const AHome = () => {
           <div className='row'>
             {data.map(newitem => 
               <div className='col-md-4' key={newitem._id}>
-                <div class="card" style={{width: "100%", borderColor: newitem.roomAvailability ? "green": "grey", borderWidth: "5px"}}>
-                  <h5 class="card-header" style={{color: newitem.roomAvailability ? "black": "grey"}}>{newitem.roomNumber}</h5>
+                <div class="card" style={{width: "100%", borderColor: newitem.roomMaintenance ? "grey": "green", borderWidth: "5px"}}>
+                  <h5 class="card-header" style={{color: newitem.roomMaintenance ? "grey": "black"}}>{newitem.roomNumber}</h5>
                   <div class="card-body">
                     <ul class="list-group">
                       <li class="list-group-item">Room Type: {newitem.roomType}</li>

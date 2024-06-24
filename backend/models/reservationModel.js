@@ -50,18 +50,70 @@ const reservationSchema = new mongoose.Schema(
     }
 );
 
-reservationSchema.pre('save', async function(next) {
-    if (!this.roomId) {
-        try {
-            const Room = mongoose.model('Room');
-            const room = await Room.findOne().select('_id').exec();
-            this.roomId = room._id;
-            next();
-        } catch (error) {
-            next(error);
+// reservationSchema.pre('save', async function(next) {
+//     if (!this.roomId) {
+//         try {
+//             const Room = mongoose.model('Room');
+//             const room = await Room.findOne().select('_id').exec();
+//             this.roomId = room._id;
+//             next();
+//         } catch (error) {
+//             next(error);
+//         }
+//     } else {
+//         next();
+//     }
+// });
+
+
+reservationSchema.pre(['save', 'updateOne'], async function(next) {
+    const reservation = this;
+
+    try {
+        const Room = mongoose.model('Room');
+
+        if (reservation.isNew || reservation.modifiedPaths().includes('status')) {
+            if (reservation.status === 'approved') {
+                await Room.updateOne(
+                    { roomNumber: reservation.roomNumber },
+                    {
+                        $set: {
+                            roomAvailability: {
+                                $not: {
+                                    $elemMatch: {
+                                        start: { $gte: reservation.startDate, $lte: reservation.endDate },
+                                        end: { $gte: reservation.startDate, $lte: reservation.endDate }
+                                    }
+                                }
+                            },
+                            $push: {
+                                unavailableDates: {
+                                    start: reservation.startDate,
+                                    end: reservation.endDate
+                                }
+                            }
+                        }
+                    }
+                );
+            } else if (reservation.status === 'rejected' || reservation.status === 'canceled') {
+                await Room.updateOne(
+                    { roomNumber: reservation.roomNumber },
+                    {
+                        $set: { roomAvailability: true },
+                        $pull: {
+                            unavailableDates: {
+                                start: reservation.startDate,
+                                end: reservation.endDate
+                            }
+                        }
+                    }
+                );
+            }
         }
-    } else {
+
         next();
+    } catch (error) {
+        next(error);
     }
 });
 

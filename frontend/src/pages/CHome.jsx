@@ -11,7 +11,6 @@ const CHome = () => {
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
   const [selectedDateRange, setSelectedDateRange] = useState([new Date(), new Date()]);
-  // const [userId, setUserId] = useState(''); // You might want to get this from your authentication context or similar
 
   useEffect(() => {
     axios.get(`http://localhost:5000${currentURL}`,{
@@ -19,10 +18,7 @@ const CHome = () => {
         'Authorization': localStorage.getItem('token')
       }
     }).then(res => {
-      // console.log("Response: ",res.data.rooms);/
-      // setData(res.data.rooms.roomAvailability ? res.data.rooms : null); 
       setData(res.data.rooms);
-      // console.log(data)
     }
   ).catch(error => {
     if (error.response) {
@@ -45,31 +41,42 @@ const CHome = () => {
     setSelectedDateRange(range);
   };
 
-  const bookRoomBtn = (roomId) => {
+  const bookRoomBtn = async (roomId) => {
     const [startDate, endDate] = selectedDateRange;
-    console.log(roomId);
-    axios.post(`http://localhost:5000${currentURL}`, {
-      _id:roomId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString()
-    }, {
-      headers: {
-        'Authorization': localStorage.getItem('token')
+    const room = data.find(room => room._id === roomId);
+    const isRoomAvailable = room.unavailableDates.every(
+      range =>
+          !(
+            !range.roomAvailabilty &&
+            (new Date(startDate) <= new Date(range.end) && new Date(endDate) >= new Date(range.start))
+          )
+    );
+    if(isRoomAvailable){
+      try {
+        const res = await axios.post(`http://localhost:5000${currentURL}`, {
+          _id: roomId,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        }, {
+          headers: {
+            'Authorization': localStorage.getItem('token')
+          }
+        });
+        console.log("Response: ", res);      
+      } catch (error) {
+        if (error.response) {
+          alert(error.response.data.message);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          alert('Error', error.message);
+        }
+        console.log(error.config);
       }
-    }).then(res => {
-      console.log("Response: ",res);
-      setData(data.map(room => room._id === roomId ? { ...room, roomAvailability: false } : room));
     }
-  ).catch(error => {
-    if (error.response) {
-      alert(error.response.data);
-    } else if (error.request) {
-      console.log(error.request);
-    } else {
-      alert('Error', error.message);
+    else {
+      alert('The selected date range is not available for this room.');
     }
-    console.log(error.config);
-  })
   }
 
   return (
@@ -88,14 +95,17 @@ const CHome = () => {
           <div className='row' style={{margin: '10px'}}>
             {data.map(newitem => 
               <div className='col-md-4' key={newitem._id}>
-                <div class="card" style={{width: "100%", borderColor: newitem.roomAvailability ? "green": "grey", borderWidth: "5px"}}>
-                  <h5 class="card-header" style={{color: newitem.roomAvailability ? "black": "grey"}}>{newitem.roomNumber}</h5>
+                <div className={`card ${newitem.roomMaintenance ? 'maintenance' : ''}`} style={{width: "100%", borderColor: newitem.roomMaintenance ? "grey": "green", borderWidth: "5px"}}>
+                  <span className='card-head'>
+                    <h5 class="card-header" style={{color: newitem.roomMaintenance ? "grey": "black"}}>{newitem.roomNumber}</h5> &nbsp;
+                    {newitem.roomMaintenance && <div className="maintenance-message">Room is under maintenance</div>}
+                  </span>
                   <div class="card-body">
                     <ul class="list-group">
                       <li class="list-group-item">Room Type: {newitem.roomType}</li>
                       <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
                     </ul> <br/>
-                    <button className="btn btn-primary" onClick={()=>bookRoomBtn(newitem._id)} disabled={!newitem.roomAvailability}>Book Room</button> &nbsp;
+                    <button className="btn btn-primary" onClick={()=>bookRoomBtn(newitem._id)} disabled={newitem.roomMaintenance}>Book Room</button> &nbsp;
                   </div>
                 </div> <br/>
               </div>

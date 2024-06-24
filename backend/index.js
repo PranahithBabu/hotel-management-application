@@ -115,13 +115,13 @@ app.post('/a/home/:userId', verifyToken, async (req,res) => {
     try{
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+            const {roomNumber, roomType, roomPrice, roomMaintenance} = req.body;
             const roomExist = await Room.findOne({roomNumber});
             if(roomExist){
                 return res.status(401).send({message: "Room Exists"});
             }
             const newRoom = new Room({
-                userId, roomNumber, roomType, roomPrice, roomAvailability
+                userId, roomNumber, roomType, roomPrice, roomMaintenance
             })
             newRoom.save();
             return res.status(200).send({message: "New Room Added" });
@@ -153,14 +153,14 @@ app.put('/a/home/:userId', verifyToken, async (req,res) => {
     try{
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const {_id, roomNumber, roomType, roomPrice, roomAvailability} = req.body;
+            const {_id, roomNumber, roomType, roomPrice, roomMaintenance} = req.body;
             // const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
             const roomExist = await Room.findById(_id);
             // const roomExist = await Room.findOne(roomNumber);
             if(!roomExist){
                 return res.status(404).send({message:"Room doesnot Exist"});
             }else{
-                const updatedRoom = await Room.findByIdAndUpdate(_id, {roomType, roomPrice, roomAvailability});
+                const updatedRoom = await Room.findByIdAndUpdate(_id, {roomType, roomPrice, roomMaintenance});
                 // const updatedRoom = await Room.findByIdAndUpdate(roomNumber, {roomType, roomPrice, roomAvailability});
                 updatedRoom.save();
                 return res.status(200).send({updatedRoom, message:"Room Updated Successfully"});
@@ -218,21 +218,40 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
         if (!req.user.isAdmin && userId === req.user.id) {
             const {_id, startDate, endDate} = req.body;
             const roomExist = await Room.findById(_id);
-            if(roomExist && roomExist.roomAvailability){
-                const newReservation = new Reservation({
-                    userId: userId,
-                    roomNumber: roomExist.roomNumber,
-                    roomType: roomExist.roomType,
-                    startDate: startDate,
-                    endDate: endDate,
-                    price: roomExist.roomPrice
-                })
-                await newReservation.save();
-                const updatedAvailability = await Room.findByIdAndUpdate(_id, {roomAvailability: false});
-                updatedAvailability.save();
-                return res.status(200).send({newReservation, message: "New Reservation Added" });
-            }else{
-                return res.status(403).send({ message: "Room is already booked or doesnot exist" });
+            if (roomExist) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const overlappingDates = roomExist.unavailableDates.some(date => {
+                    const bookedStart = new Date(date.start);
+                    const bookedEnd = new Date(date.end);
+                    console.log("start: ",start);
+                    console.log("bookedStart: ",bookedStart);
+                    console.log("end: ",end);
+                    console.log("bookedEnd: ",bookedEnd);
+                    return !date.roomAvailability && (start <= bookedEnd && end >= bookedStart);
+                });
+                console.log("Bool is: ",overlappingDates);
+                if(!overlappingDates) {
+                    const newReservation = new Reservation({
+                        userId: userId,
+                        roomNumber: roomExist.roomNumber,
+                        roomType: roomExist.roomType,
+                        startDate: startDate,
+                        endDate: endDate,
+                        price: roomExist.roomPrice
+                    })
+                    await newReservation.save();
+
+                    // roomExist.unavailableDates.push({ start: startDate, end: endDate, roomAvailability: true });
+                    // await roomExist.save();
+                    return res.status(200).send({ newReservation, message: "New Reservation Added. Awaiting approval" });
+                }
+                else {
+                    return res.status(403).send({ message: "Room is already booked for selected date range." });
+                }
+            }
+            else {
+                return res.status(403).send({ message: "Room doesnot exist" });
             }
         } else {
             return res.status(403).send({ message: "Access denied. Only customer can access this route or invalid token." });
@@ -249,6 +268,11 @@ app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
             const {roomNumber, startDate, endDate} = req.body;
+            
+            if (!startDate || !endDate) {
+                return res.status(400).send({ message: "Start and end dates are required" });
+            }
+
             const bookingExist = await Room.findOne({roomNumber});
             console.log(bookingExist);
             if(!bookingExist){
@@ -264,8 +288,8 @@ app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
                     price: bookingExist.roomPrice
                 })
                 await newReservation.save();
-                const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
-                await updatedAvailability.save();
+                // const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
+                // await updatedAvailability.save();
                 return res.status(200).send({ newReservation, message: "Room booked successfully" });
             }else{
                 return res.status(403).send({ message: "Room already booked. Please check for other rooms." });
@@ -306,23 +330,41 @@ app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
             const reservationExist = await Reservation.findById(_id);
             if(reservationExist){
                 const updatedReservation = await Reservation.findByIdAndUpdate(_id, {
-                    userId: userId,
-                    ...(startDate && { startDate }),
-                    ...(endDate && { endDate }),
-                    ...(status && { status })
+                    userId: reservationExist.userId,
+                    ...(startDate && { startDate: new Date(startDate) }),
+                    ...(endDate && { endDate: new Date(endDate) }),
+                    status: status || reservationExist.status
                 })
-                await updatedReservation.save();
+                console.log("Res: ",reservationExist);
+                // await updatedReservation.save();
 
-                // Getting DATE intact to block booked dates with available one's (In progress)
                 if(status && status === "approved"){
+                    const room = await Room.findOne({ roomNumber: reservationExist.roomNumber });
+                    if (room) {
+                        console.log("Before: ",room);
+                        await room.unavailableDates.push({
+                            start: reservationExist.startDate,
+                            end: reservationExist.endDate,
+                            roomAvailability: false
+                        });
+                        await room.save();
+                        console.log("After: ",room);
+                    }
                     const updatedBooking = await Reservation.findByIdAndUpdate(_id, {
-                        bookedStartDate: reservationExist.startDate,
-                        bookedEndDate: reservationExist.endDate
+                        bookedStartDate: startDate,
+                        bookedEndDate: endDate
                     });
-                    await updatedBooking.save();
                     return res.status(200).send({updatedBooking, message: "Reservation updated successfully with BOOKING" });
                 }
-
+                else if (status && (status === "rejected" || status === "canceled")) {
+                    const room = await Room.findOne({ roomNumber: reservationExist.roomNumber });
+                    if (room) {
+                        room.unavailableDates = room.unavailableDates.filter(date => {
+                            return !(new Date(date.start).toISOString() === new Date(startDate).toISOString() && new Date(date.end).toISOString() === new Date(endDate).toISOString());
+                        });
+                        await room.save();
+                    }
+                }
                 return res.status(200).send({updatedReservation, message: "Reservation updated successfully" });
             }else{
                 return res.status(403).send({ message: "Reservation doesnot exist. Create a new one!" });
@@ -412,7 +454,7 @@ app.delete('/c/dashboard/:userId', verifyToken, async (req,res) => {
                 return res.status(403).send({message: "Reservation doesnot exist"});
             }
             await Reservation.findByIdAndDelete(_id);
-            room.roomAvailability = true;
+            // room.roomAvailability = true;
             await room.save();
             return res.status(200).send({message: "Deleted reservation successfully."})
         } else {

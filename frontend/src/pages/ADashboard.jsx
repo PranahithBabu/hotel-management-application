@@ -4,10 +4,10 @@ import Footer from '../components/Footer';
 import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import '../index.css';
+import moment from 'moment';
 
 const ADashboard = () => {
   const location = useLocation();
-  // const currentPage = location.pathname.split('/')[2];
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -19,27 +19,6 @@ const ADashboard = () => {
     status: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // useEffect(() => {
-  //   axios.get(`http://localhost:5000${currentURL}`,{
-  //     headers: {
-  //       'Authorization': localStorage.getItem('token')
-  //     }
-  //   }).then(res => {
-  //     setData(res.data.reservations);
-  //     setRooms(res.data.rooms);
-  //   }
-  //   ).catch(error=>{
-  //     if (error.response) {
-  //       alert(error.response.data);
-  //     } else if (error.request) {
-  //       console.log(error.request);
-  //     } else {
-  //       alert('Error', error.message);
-  //     }
-  //     console.log(error.config);
-  //   })
-  // },[])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +32,7 @@ const ADashboard = () => {
         setRooms(res.data.rooms);
       } catch (error) {
         if (error.response) {
-          alert(error.response.data);
+          alert(error.response.data.message);
         } else if (error.request) {
           console.log(error.request);
         } else {
@@ -86,13 +65,13 @@ const ADashboard = () => {
   }
 
   const changeHandler = (e) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
     setReservation({
       ...reservation,
       [name]: value
-    })
-  }
-
+    });
+  };
+  
   const submitHandler = e => {
     e.preventDefault();
     if (reservation._id) {
@@ -118,7 +97,7 @@ const ADashboard = () => {
         setIsModalOpen(false);
       }).catch(error => {
         if (error.response) {
-          alert(error.response.data);
+          alert(error.response.data.message);
         } else if (error.request) {
           console.log(error.request);
         } else {
@@ -130,13 +109,23 @@ const ADashboard = () => {
   };
 
   const editResBtn = (reservation) => {
-    setReservation(reservation);
+    setReservation({
+      ...reservation,
+      startDate: moment.utc(reservation.startDate).format('YYYY-MM-DD'),
+      endDate: moment.utc(reservation.endDate).format('YYYY-MM-DD')
+    });
     setIsModalOpen(true);
   }
 
   const updateReservation = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:5000${currentURL}`, reservation, {
+    console.log("Selected: ",reservation.startDate);
+    const updatedReservation = {
+      ...reservation,
+      startDate: moment.utc(reservation.startDate).toISOString(),
+      endDate: moment.utc(reservation.endDate).toISOString()
+    };
+    axios.put(`http://localhost:5000${currentURL}`, updatedReservation, {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -145,9 +134,10 @@ const ADashboard = () => {
       setReservation({ _id: '', roomNumber: '', startDate: '', endDate: '', status: ''});
       setIsModalOpen(false);
       setData(data.map(item => (item._id === reservation._id ? res.data.updatedReservation : item)))
+      window.location.reload();
     }).catch(error => {
       if (error.response) {
-        alert(error.response.data);
+        alert(error.response.data.message);
       } else if (error.request) {
         console.log(error.request);
       } else {
@@ -164,9 +154,10 @@ const ADashboard = () => {
       }
     }).then(res => {
       console.log(res);
+      setData(data.filter(item => item._id !== _id));
     }).catch(error=>{
       if (error.response) {
-        alert(error.response.data);
+        alert(error.response.data.message);
       } else if (error.request) {
         console.log(error.request);
       } else {
@@ -175,6 +166,10 @@ const ADashboard = () => {
       console.log(error.config);
     })
   }
+
+  const formatDate = (dateStr) => {
+    return moment.utc(dateStr).format('YYYY-MM-DD');
+  };
 
   return (
     <div>
@@ -240,8 +235,9 @@ const ADashboard = () => {
                   <td>{reservation.roomNumber}</td>
                   <td>{reservation.roomType}</td>
                   <td>${reservation.price}</td>
-                  <td>{new Date(reservation.startDate).toLocaleDateString()} 
-                  - {new Date(reservation.endDate).toLocaleDateString()}</td>
+                  <td>
+                    {formatDate(reservation.startDate)} --- {formatDate(reservation.endDate)}
+                  </td>
                   <td>{reservation.status}</td>
                   <td>
                     <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>

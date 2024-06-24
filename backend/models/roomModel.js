@@ -19,10 +19,17 @@ const roomSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
-        roomAvailability: {
+        roomMaintenance: {
             type: Boolean,
-            required: true,
+            required: false,
         },
+        unavailableDates: [
+            {
+                start: { type: Date, required: true },
+                end: { type: Date, required: true },
+                roomAvailability: { type: Boolean, required: true, default: true }
+            }
+        ]
     },
     {
         timestamps: true,

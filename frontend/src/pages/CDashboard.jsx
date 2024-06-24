@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import moment from 'moment';
 
 const CDashboard = () => {
   const location = useLocation();
@@ -41,7 +42,12 @@ const CDashboard = () => {
 
   const editResBtn = (reservation) => {
     console.log(reservation);
-    setReservation(reservation);
+    // setReservation(reservation);
+    setReservation({
+      ...reservation,
+      startDate: moment.utc(reservation.startDate).format('YYYY-MM-DD'),
+      endDate: moment.utc(reservation.endDate).format('YYYY-MM-DD')
+    });
     setIsModal(true);
   }
 
@@ -66,7 +72,12 @@ const CDashboard = () => {
 
   const updateReservation = (e) => {
     e.preventDefault();
-    axios.put(`http://localhost:5000${currentURL}`, reservation, {
+    const updatedReservation = {
+      ...reservation,
+      startDate: moment.utc(reservation.startDate).toISOString(),
+      endDate: moment.utc(reservation.endDate).toISOString()
+    };
+    axios.put(`http://localhost:5000${currentURL}`, updatedReservation, {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -104,6 +115,10 @@ const CDashboard = () => {
       console.log(error.config);
     })
   }
+
+  const formatDate = (dateStr) => {
+    return moment.utc(dateStr).format('YYYY-MM-DD');
+  };
 
   return (
     <div>
@@ -148,8 +163,11 @@ const CDashboard = () => {
                 <td>{reservation.roomNumber}</td>
                 <td>{reservation.roomType}</td>
                 <td>${reservation.price}</td>
-                <td>{new Date(reservation.startDate).toLocaleDateString()} 
-                - {new Date(reservation.endDate).toLocaleDateString()}</td>
+                <td>
+                {formatDate(reservation.startDate)} --- {formatDate(reservation.endDate)}
+                  {/* {new Date(reservation.startDate).toLocaleDateString()} 
+                - {new Date(reservation.endDate).toLocaleDateString()} */}
+                </td>
                 <td>{reservation.status}</td>
                 <td>
                   <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>
