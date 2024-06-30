@@ -47,14 +47,14 @@ const Login = () => {
   return (
     <div>
       <Header currentPage={currentPage} />
-      <div>
+      <div className='main-container'>
         <form onSubmit={submitHandler} className='form' action='login-account.html' autoComplete='off'>
           <div className='form-group'><input type='email' placeholder='Email Address' name='email' onChange={changeHandler} /></div>
           <div className='form-group'><input type='password' placeholder='Password' name='password' onChange={changeHandler} /></div>
           <div className='form-group'><input className='btn btn-primary' type='submit' value='Login'/></div>
         </form>
         <br/>
-        New user? Click here to create an account
+        New user?
         <Link to='/register'><button className='btn btn-success'>Register</button></Link> &nbsp;
       </div>
       <Footer />

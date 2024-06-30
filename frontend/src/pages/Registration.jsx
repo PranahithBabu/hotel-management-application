@@ -33,7 +33,6 @@ const Registration = () => {
                 check = true;
             } else {
                 console.log("Registration canceled by user");
-                // document.getElementById('secretkey').classList.add('invalid');
             }
         }
     }else{
@@ -70,7 +69,7 @@ const Registration = () => {
   return (
     <div>
       <Header currentPage={currentPage} />
-      <div>
+      <div className='main-container'>
         <form onSubmit={submitHandler} className='form' action='register-account.html' autoComplete='off'>
           <div className='form-group'><input type='text' placeholder='Username' name='name' onChange={changeHandler} /></div>
           <div className='form-group'><input type='email' placeholder='Email Address' name='email' onChange={changeHandler} /></div>
@@ -79,14 +78,21 @@ const Registration = () => {
           <div className='question-mark-container'>
             <input type="password" id="secretkey" name='secretKey' className="form-control" aria-describedby="passwordHelpBlock" 
             placeholder="Secret key" onChange={changeHandler}/>
-            <span className='question-mark'>?</span>
-            <div className='tooltip' role="tooltip">For Admin Login</div>
+            <div className='question-mark-wrapper'>
+              <span className='question-mark'>?</span>
+              <div className='tooltip'>For Admin Login</div>
+            </div>
           </div>
           <div className='form-group'><input className='btn btn-primary' type='submit' value='Register'/></div>
         </form>
         <br/>
-        Existing customer? Click here to Login
+        Existing customer?
         <Link to='/login'><button className='btn btn-success'>Login</button></Link> &nbsp;
+        {/* <div className='existing-customer-container'>
+          <span>Existing customer? Click here to Login</span> &nbsp;
+          <Link to='/login'><button className='btn btn-success'>Login</button></Link> &nbsp;
+        </div> */}
+        
       </div>
       <Footer />
     </div>

@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* .main-container {
+  margin-top: 80px;
+} */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
 .header {
     background-color: cadetblue;
     color: darkblue;
@@ -9,15 +23,83 @@
     padding: 20px;
     font-weight: bold;
     font-size: 20px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    /* background-color: #333; */
-    /* color: white; */
+    /* position: fixed; */
+    top: 0;
+    width: 100%;
+    z-index: 1;
 }
 
+.menu-toggle {
+  cursor: pointer;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+}
+
+.line {
+  width: 100%;
+  height: 3px;
+  background-color: black;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.hamburger.open .line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.open .line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open .line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.menu {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: #16aeae;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.menu.open {
+  display: block;
+}
+
+.menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu ul li {
+  margin: 10px 0;
+}
+
+.menu ul li a {
+  color: black;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.menu ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
 .footer {
     background-color: black;
     color: white;
@@ -29,115 +111,101 @@
     width: 100%;
 }
 
-.heading {
+/* .heading {
   display: flex;
   justify-content: space-between;
   padding: 10px 20px;
+} */
+
+/* .main {
+    text-align: center;
+} */
+
+
+/* Registration & Login*/
+.main-container {
+  margin-top: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.main {
-    text-align: center;
+.form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  margin: 10px 0px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.existing-customer-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .question-mark-container {
-    display: inline-block;
     position: relative;
 }
-.question-mark {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    text-align: center;
-    border-radius: 50%;
-    border: 1px solid #999;
-    cursor: pointer;
-}
-.tooltip {
-    visibility: hidden;
-    position: absolute;
-    bottom: 120%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 1;
-}
-.question-mark-container:hover .tooltip {
-    visibility: visible;
+
+.question-mark-wrapper {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
 }
 
-.invalid {
-    border: 2px solid red;
+.question-mark {
+  cursor: pointer;
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #fff;
 }
-  .menu-toggle {
-    cursor: pointer;
-  }
-  
-  .hamburger {
-    width: 25px;
-    height: 3px;
-    background-color: black;
-    margin: 5px 0;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .hamburger.open .line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-    /* transform: translateY(8px) rotate(45deg); */
-  }
-  
-  .hamburger.open .line:nth-child(2) {
-    opacity: 0;
-    /* transform: rotate(45deg) translate(5px, 5px); */
-  }
-  
-  .hamburger.open .line:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-    /* transform: translateY(8px) rotate(45deg); */
-  }
-  /* .line {
-    width: 25px;
-    height: 2px;
-    background-color: #000;
-    margin: 5px;
-    transition: background-color 0.3s ease-in-out;
-  } */
-  .menu {
-    display: none;
-    position: absolute;
-    top: 40px; /* Adjust as needed */
-    right: 0;
-    background-color: #16aeae;
-    padding: 5px;
-  }
-  
-  .menu.open {
-    display: block;
-  }
-  
-  .menu ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .menu ul li {
-    margin: 5px 0;
-  }
-  
-  .menu ul li a {
-    color: black;
-    text-decoration: none;
-  }
-  
-  .menu ul li a:hover {
-    text-decoration: underline;
-  }
-  
+
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: 125%;
+  right: 0;
+  background-color: black;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.question-mark:hover + .tooltip{
+  visibility: visible;
+  opacity: 1;
+}
+
+/* .invalid {
+    border: 2px solid red;
+} */
 
   /* New */
 

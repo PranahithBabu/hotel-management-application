@@ -1,14 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {Link} from 'react-router-dom'
 
 const Header = ({currentPage}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
   const toggleMenu = () => {
-    // console.log(isMenuOpen);
     setIsMenuOpen(!isMenuOpen);
-    // console.log(isMenuOpen);
   }
-  // console.log("It is: ",currentPage.replace('home','dashboard'));
+
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="header">
@@ -22,7 +34,7 @@ const Header = ({currentPage}) => {
               <div className="line"></div>
             </div>
           </div>
-          <div className={`menu ${isMenuOpen ? 'open' : ''}`}>
+          <div className={`menu ${isMenuOpen ? 'open' : ''}`} ref={menuRef}>
             <ul>
               {currentPage.includes("home") ? (
                 <li><a href={currentPage.replace('home','dashboard')}>Dashboard</a></li>
