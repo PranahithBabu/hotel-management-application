@@ -174,7 +174,7 @@ const ADashboard = () => {
   return (
     <div>
       <Header currentPage={currentURL} />
-      <div>
+      <div className='content'>
         <div className="reservations-container">
           <div className='heading'>
             <h2>Reservations</h2>

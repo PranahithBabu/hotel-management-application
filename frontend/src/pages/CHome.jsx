@@ -80,9 +80,9 @@ const CHome = () => {
   }
 
   return (
-    <div>
+    <div className='content-c-home'>
       <Header currentPage={currentURL} />
-      <div className='main-container'>
+      <div className='main-chome-container'>
         <div className='calendar-container'>
           <h2>Book a Room</h2>
           <Calendar

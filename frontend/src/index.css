@@ -2,10 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
-/* .main-container {
-  margin-top: 80px;
-} */
+.btn-info {
+  flex: 1 1 100%;
+}
 
 body, html {
   margin: 0;
@@ -13,6 +12,12 @@ body, html {
   height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  padding-top: 60px;
 }
 
 /* Header */
@@ -27,10 +32,13 @@ body, html {
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    /* position: fixed; */
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    z-index: 1;
+    z-index: 1000;
+    box-sizing: border-box;
 }
 
 .menu-toggle {
@@ -111,20 +119,9 @@ body, html {
     width: 100%;
 }
 
-/* .heading {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 20px;
-} */
-
-/* .main {
-    text-align: center;
-} */
-
-
-/* Registration & Login*/
+/* Initial, Registration, & Login*/
 .main-container {
-  margin-top: 20px;
+  margin-top: 40px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -203,51 +200,90 @@ body, html {
   opacity: 1;
 }
 
-/* .invalid {
-    border: 2px solid red;
-} */
+/* Admin home */
+.content-a-home {
+  margin-top: 0%;
+  margin-bottom: 40px;
+  min-height: 100%;
+  position: relative;
+}
 
-  /* New */
+.main-ahome-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .form-a-home {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .form-group-a-home {
-    flex: 1 1 45%;
-    display: flex;
-    flex-direction: column;
-    margin-top: 2px;
-  }
-  
-  .form-group-a-home label {
-    margin-left: 10px
-  }
-  
-  .form-group-a-home input, .form-group-a-home select {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid black;
-  }
-  
-  .form-group-a-home input[type='checkbox'] {
-    width: auto;
-    margin-left: 0;
-  }
+.form-a-home {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1200px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  margin-top: 75px;
+  border-radius: 5px;
+}
 
-  /* .btn {
-    width: auto;
-  } */
-  
-  .btn-info {
-    flex: 1 1 100%;
-  }
-  
-  /* Calendar */
+.form-group-a-home {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+}
 
-  /* Calendar container */
+.form-group-a-home label {
+  margin-left: 10px
+}
+
+.form-group-a-home input, .form-group-a-home select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid black;
+}
+
+.form-group-a-home input[type='checkbox'] {
+  width: auto;
+  margin-left: 0;
+}
+  
+.card {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cards-container-ahome {
+  margin-top: calc(100px + 60px);;
+  /* margin-left: 10%;
+  margin-right: 10%; */
+  width: 100%;
+}
+
+/* Mobile view for Admin home page */
+
+/* Customer home */
+.content-c-home {
+  margin-top: 20px;
+  margin-bottom: 40px;
+
+  min-height: 100%;
+  position: relative;
+}
+
 .react-calendar {
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -257,7 +293,6 @@ body, html {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Navigation buttons and labels */
 .react-calendar__navigation {
   display: flex;
   justify-content: space-between;
@@ -278,7 +313,6 @@ body, html {
   background-color: #f0f0f0;
 }
 
-/* Calendar month and days */
 .react-calendar__month-view__weekdays {
   font-weight: bold;
   text-align: center;
@@ -301,7 +335,6 @@ body, html {
   border-color: #91d5ff;
 }
 
-/* Selected date */
 .react-calendar__tile--active {
   background-color: #1890ff;
   color: white;
@@ -313,77 +346,66 @@ body, html {
   background-color: #40a9ff;
 }
 
-/* Disabled dates */
 .react-calendar__tile--now {
   background-color: #fffb8f;
   border-radius: 4px;
 }
 
-/* Customizing the calendar header */
 .react-calendar__navigation__label {
   font-size: 1.2em;
   font-weight: bold;
 }
 
-/* Adjusting the overall font and spacing */
 .react-calendar__tile {
   font-family: 'Arial', sans-serif;
   font-size: 0.9em;
 }
 
-/* Container to hold the calendar and the cards */
-.main-container {
+.main-chome-container {
   display: flex;
-  flex-wrap: wrap; /* Allow items to wrap to the next line */
+  flex-wrap: wrap;
 }
 
-/* Fixed calendar container */
 .calendar-container {
   position: fixed;
-  top: 10%;
-  left: 20px;
+  top: 80px;
+  left: 40px;
   width: 300px;
   max-width: 100%;
 }
 
-/* Cards container with margin to the left to accommodate the fixed calendar */
 .cards-container {
-  margin-left: 350px; /* Adjust this value according to the width of your calendar and the left margin */
+  margin-left: 350px;
   padding: 20px;
-  width: calc(100% - 350px); /* Ensure the cards take the remaining width */
+  width: calc(100% - 350px);
 }
 
-/* Card styling */
-.card {
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Media query for smaller screens */
 @media (max-width: 768px) {
-  .main-container {
+  .main-chome-container {
     flex-direction: column;
-    align-items: center; /* Center items horizontally */
+    align-items: center;
   }
   
   .calendar-container {
-    position: static; /* Remove fixed positioning */
-    margin-bottom: 20px; /* Add some space below the calendar */
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 1;
+    padding: 10px;
+    width: 100%;
   }
   
   .cards-container {
     margin-left: 0;
     width: 100%;
-    padding: 0 20px; /* Adjust padding for smaller screens */
+    margin-top: 100%;
   }
+
 }
 
 /* Admin dashboard table */
-
 .reservations-container {
   padding: 20px;
 }

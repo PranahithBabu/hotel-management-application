@@ -9,7 +9,7 @@ const Initial = () => {
   return (
     <div>
         <Header currentPage={currentPage} />
-        <div className='main'>
+        <div className='main-container'>
             Book you rooms now at HOING. <br />
             <i>Manage your reservation in 1 click.</i> <br/>
             <div>

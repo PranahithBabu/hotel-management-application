@@ -115,13 +115,13 @@ const CDashboard = () => {
       console.log(error.config);
     })
   }
-
+  
   const formatDate = (dateStr) => {
     return moment.utc(dateStr).format('YYYY-MM-DD');
   };
 
   return (
-    <div>
+    <div className='content'>
       <Header currentPage={currentURL} />
       <div>
         {isModal &&

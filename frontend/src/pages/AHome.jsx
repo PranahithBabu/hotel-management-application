@@ -142,11 +142,11 @@ const AHome = () => {
   }
 
   return (
-    <div>
+    <div className='content-a-home'>
       <Header currentPage={currentURL} />
-      <div>
+      {/* <div> */}
       <section>
-      <div className='container'>
+      <div className='main-ahome-container'>
         <div className='fixed-element'>
           <div>
             <form onSubmit={submitHandler} className='form-a-home' autoComplete='off'>
@@ -184,29 +184,30 @@ const AHome = () => {
             <br/>
           </div>
 
-
-          <div className='row'>
-            {data.map(newitem => 
-              <div className='col-md-4' key={newitem._id}>
-                <div class="card" style={{width: "100%", borderColor: newitem.roomMaintenance ? "grey": "green", borderWidth: "5px"}}>
-                  <h5 class="card-header" style={{color: newitem.roomMaintenance ? "grey": "black"}}>{newitem.roomNumber}</h5>
-                  <div class="card-body">
-                    <ul class="list-group">
-                      <li class="list-group-item">Room Type: {newitem.roomType}</li>
-                      <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
-                    </ul> <br/>
-                    <button className="btn btn-danger" onClick={()=>deleteRoomBtn(newitem._id)}>Delete Room</button> &nbsp;
-                    <button className='btn btn-warning' onClick={()=>editRoomBtn(newitem)}>Edit Room</button>
-                  </div>
-                </div> <br/>
-              </div>
-            )}
+          <div className='cards-container-ahome'>
+            <div className='row'>
+              {data.map(newitem => 
+                <div className='col-md-4' key={newitem._id}>
+                  <div class="card" style={{width: "100%", borderColor: newitem.roomMaintenance ? "grey": "green", borderWidth: "5px"}}>
+                    <h5 class="card-header" style={{color: newitem.roomMaintenance ? "grey": "black"}}>{newitem.roomNumber}</h5>
+                    <div class="card-body">
+                      <ul class="list-group">
+                        <li class="list-group-item">Room Type: {newitem.roomType}</li>
+                        <li class="list-group-item">Room Price: ${newitem.roomPrice}</li>
+                      </ul> <br/>
+                      <button className="btn btn-danger" onClick={()=>deleteRoomBtn(newitem._id)}>Delete Room</button> &nbsp;
+                      <button className='btn btn-warning' onClick={()=>editRoomBtn(newitem)}>Edit Room</button>
+                    </div>
+                  </div> <br/>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
       </div>
       </section>
-      </div>
+      {/* </div> */}
       <Footer />
     </div>
   )
