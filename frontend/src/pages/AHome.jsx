@@ -144,8 +144,7 @@ const AHome = () => {
   return (
     <div className='content-a-home'>
       <Header currentPage={currentURL} />
-      {/* <div> */}
-      <section>
+      {/* <section> */}
       <div className='main-ahome-container'>
         <div className='fixed-element'>
           <div>
@@ -206,8 +205,7 @@ const AHome = () => {
 
         </div>
       </div>
-      </section>
-      {/* </div> */}
+      {/* </section> */}
       <Footer />
     </div>
   )
