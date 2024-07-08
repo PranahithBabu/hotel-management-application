@@ -138,7 +138,13 @@ const AHome = () => {
   }
   
   const cancelEditBtn = () => {
-    window.location.reload();
+    setRoom({
+      roomNumber: '',
+      roomType: '',
+      roomPrice: '',
+      roomMaintenance: false
+    });
+    setIsEdit(false);
   }
 
   return (
@@ -150,7 +156,7 @@ const AHome = () => {
           <div>
             <form onSubmit={submitHandler} className='form-a-home' autoComplete='off'>
               <div className='form-group-a-home'>
-                <input type='text' placeholder='Room Number' value={room.roomNumber} name='roomNumber' onChange={changeHandler} />
+                <input type='text' placeholder='Room Number' value={room.roomNumber} name='roomNumber' onChange={changeHandler} disabled={isEdit} />
               </div>
               <div className='form-group-a-home'>
                 <select name='roomType' value={room.roomType} onChange={changeHandler}>
