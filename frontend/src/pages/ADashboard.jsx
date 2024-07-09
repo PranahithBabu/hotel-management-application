@@ -95,6 +95,9 @@ const ADashboard = () => {
         });
         setData([...data, res.data.newReservation]);
         setIsModalOpen(false);
+        setTimeout(() => {
+          alert(res.data.message);
+        }, 100);
       }).catch(error => {
         if (error.response) {
           alert(error.response.data.message);
@@ -135,6 +138,9 @@ const ADashboard = () => {
       setIsModalOpen(false);
       setData(data.map(item => (item._id === reservation._id ? res.data.updatedReservation : item)))
       window.location.reload();
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
     }).catch(error => {
       if (error.response) {
         alert(error.response.data.message);
@@ -155,6 +161,9 @@ const ADashboard = () => {
     }).then(res => {
       console.log(res);
       setData(data.filter(item => item._id !== _id));
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
     }).catch(error=>{
       if (error.response) {
         alert(error.response.data.message);
@@ -170,6 +179,16 @@ const ADashboard = () => {
   const formatDate = (dateStr) => {
     return moment.utc(dateStr).format('YYYY-MM-DD');
   };
+
+  const calculateDays = (startDate, endDate) => {
+    const start = moment.utc(startDate);
+    const end = moment.utc(endDate);
+    return end.diff(start, 'days');
+  }
+
+  const calculateTotalPrice = (days, pricePerDay) => {
+    return days * pricePerDay;
+  }
 
   return (
     <div>
@@ -223,20 +242,23 @@ const ADashboard = () => {
                 <th>Room Number</th>
                 <th>Room Type</th>
                 <th>Price</th>
-                <th>Booking Date</th>
+                <th>Booking Date (YYYY-MM-DD) </th>
                 <th>Status</th>
                 <th>Modify Reservation</th>
               </tr>
             </thead>
             <tbody>
-              {data.map(reservation => (
+              {data.map(reservation => {
+                const days = calculateDays(reservation.startDate, reservation.endDate);
+                const totalPrice = calculateTotalPrice(days, reservation.price);
+                return (
                 <tr key={reservation._id}>
                   <td>{reservation.userId}</td>
                   <td>{reservation.roomNumber}</td>
                   <td>{reservation.roomType}</td>
-                  <td>${reservation.price}</td>
+                  <td>${totalPrice}</td>
                   <td>
-                    {formatDate(reservation.startDate)} --- {formatDate(reservation.endDate)}
+                    {formatDate(reservation.startDate)} to {formatDate(reservation.endDate)}
                   </td>
                   <td>{reservation.status}</td>
                   <td>
@@ -245,11 +267,11 @@ const ADashboard = () => {
                     <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Update Reservation</button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
-
       </div>
       <Footer />
     </div>

@@ -263,45 +263,103 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
 })
 
 // Admin Dashboard Page Requests
-app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
-    try{
+// app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
+//     try{
+//         const userId = req.params.userId;
+//         if (req.user.isAdmin && userId === req.user.id) {
+//             const {roomNumber, startDate, endDate} = req.body;
+            
+//             if (!startDate || !endDate) {
+//                 return res.status(400).send({ message: "Start and end dates are required" });
+//             }
+
+//             const bookingExist = await Room.findOne({roomNumber});
+//             console.log(bookingExist);
+//             if(!bookingExist){
+//                 return res.status(403).send({message: "Room doesnot exist"});
+//             }
+//             if(bookingExist.roomAvailability){
+//                 const newReservation = new Reservation({
+//                     userId: userId,
+//                     roomNumber: roomNumber,
+//                     roomType: bookingExist.roomType,
+//                     startDate: startDate,
+//                     endDate: endDate,
+//                     price: bookingExist.roomPrice
+//                 })
+//                 await newReservation.save();
+//                 // const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
+//                 // await updatedAvailability.save();
+//                 return res.status(200).send({ newReservation, message: "Room booked successfully" });
+//             }else{
+//                 return res.status(403).send({ message: "Room already booked. Please check for other rooms." });
+//             }
+//         } else {
+//             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
+//         }
+//     }catch(err){
+//         console.log(err.message);
+//         return res.status(500).send({message: err.message});
+//     }
+// })
+
+app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
+    try {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const {roomNumber, startDate, endDate} = req.body;
-            
+            const { roomNumber, startDate, endDate } = req.body;
+
             if (!startDate || !endDate) {
                 return res.status(400).send({ message: "Start and end dates are required" });
             }
 
-            const bookingExist = await Room.findOne({roomNumber});
-            console.log(bookingExist);
-            if(!bookingExist){
-                return res.status(403).send({message: "Room doesnot exist"});
+            const room = await Room.findOne({ roomNumber });
+            if (!room) {
+                return res.status(403).send({ message: "Room does not exist" });
             }
-            if(bookingExist.roomAvailability){
-                const newReservation = new Reservation({
-                    userId: userId,
-                    roomNumber: roomNumber,
-                    roomType: bookingExist.roomType,
-                    startDate: startDate,
-                    endDate: endDate,
-                    price: bookingExist.roomPrice
-                })
-                await newReservation.save();
-                // const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
-                // await updatedAvailability.save();
-                return res.status(200).send({ newReservation, message: "Room booked successfully" });
-            }else{
-                return res.status(403).send({ message: "Room already booked. Please check for other rooms." });
+
+            const newStartDate = new Date(startDate);
+            const newEndDate = new Date(endDate);
+
+            // Check for overlapping dates
+            const isRoomAvailable = room.unavailableDates.every(date => {
+                const existingStartDate = new Date(date.start);
+                const existingEndDate = new Date(date.end);
+                return newEndDate <= existingStartDate || newStartDate >= existingEndDate;
+            });
+
+            if (!isRoomAvailable) {
+                return res.status(403).send({ message: "Room already booked for the selected dates. Please check for other rooms or dates." });
             }
+
+            const newReservation = new Reservation({
+                userId: userId,
+                roomNumber: roomNumber,
+                roomType: room.roomType,
+                startDate: startDate,
+                endDate: endDate,
+                price: room.roomPrice
+            });
+            await newReservation.save();
+
+            // Add new booking to unavailable dates
+            room.unavailableDates.push({
+                start: startDate,
+                end: endDate,
+                roomAvailability: false
+            });
+            await room.save();
+
+            return res.status(200).send({ newReservation, message: "Room booked successfully" });
         } else {
             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
         }
-    }catch(err){
+    } catch (err) {
         console.log(err.message);
-        return res.status(500).send({message: err.message});
+        return res.status(500).send({ message: err.message });
     }
-})
+});
+
 
 app.get('/a/dashboard/:userId', verifyToken, async (req,res) => {
     try{

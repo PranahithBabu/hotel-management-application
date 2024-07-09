@@ -62,7 +62,10 @@ const CHome = () => {
             'Authorization': localStorage.getItem('token')
           }
         });
-        console.log("Response: ", res);      
+        console.log("Response: ", res); 
+        setTimeout(() => {
+          alert(res.data.message);
+        }, 100);     
       } catch (error) {
         if (error.response) {
           alert(error.response.data.message);

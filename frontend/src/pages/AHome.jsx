@@ -74,6 +74,9 @@ const AHome = () => {
       }).then(res => {
         setData(data.map(item => (item._id === editId ? res.data : item)));
         resetForm();
+        setTimeout(() => {
+          alert(res.data.message);
+        }, 100);
       }).catch(error => {
         console.error(error);
         alert('Error updating room');
@@ -88,6 +91,9 @@ const AHome = () => {
         res => {
           setData([...data, res]);
           setRoom({roomNumber: '', roomType:'', roomPrice: '', roomMaintenance: false});
+          setTimeout(() => {
+            alert(res.data.message);
+          }, 100);
         }
       ).catch(error=>{
         if (error.response) {
@@ -124,7 +130,11 @@ const AHome = () => {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
-    }).then(res => console.log(res)
+    }).then(res => {
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
+    }
     ).catch(error=>{
       if (error.response) {
         alert(error.response.data);

@@ -84,7 +84,10 @@ const CDashboard = () => {
     }).then(res => {
       setReservation({ _id: '', startDate: '', endDate: ''});
       setIsModal(false);
-      setData(data.map(item => (item._id === reservation._id ? res.data.updatedReservation : item)))
+      setData(data.map(item => (item._id === reservation._id ? res.data.updatedReservation : item)));
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
     }).catch(error => {
       if (error.response) {
         alert(error.response.data);
@@ -104,6 +107,9 @@ const CDashboard = () => {
     }
     }).then(res => {
       console.log(res);
+      setTimeout(() => {
+        alert(res.data.message);
+      }, 100);
     }).catch(error=>{
       if (error.response) {
         alert(error.response.data);
@@ -120,64 +126,79 @@ const CDashboard = () => {
     return moment.utc(dateStr).format('YYYY-MM-DD');
   };
 
+  const calculateDays = (startDate, endDate) => {
+    const start = moment.utc(startDate);
+    const end = moment.utc(endDate);
+    return end.diff(start, 'days');
+  }
+
+  const calculateTotalPrice = (days, pricePerDay) => {
+    return days * pricePerDay;
+  }
+
   return (
-    <div className='content'>
+    <div>
       <Header currentPage={currentURL} />
-      <div>
-        {isModal &&
-          <div className="check" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-            <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
-              <span onClick={closeModal} style={{ float: 'right', cursor: 'pointer' }}>&times;</span> <br/>
-              <form onSubmit={submitHandler} className='form-c-home' autoComplete='off'>
-                <div className='form-group-c-home'>
-                  <label>Start Date</label>
-                  <input type='date' name='startDate' value={reservation.startDate} onChange={changeHandler} />
-                </div>
-                <div className='form-group-c-home'>
-                  <label>End Date</label>
-                  <input type='date' name='endDate' value={reservation.endDate} onChange={changeHandler} />
-                </div>
-                <div className='form-group-c-home'>
-                  <input type='submit' className='btn btn-primary' value={reservation._id && 'Update Reservation Request'} />
-                </div>
-              </form>
+      <div className='content'>
+        <div className='reservations-container'>
+          <h2>Reservations</h2>
+          {isModal &&
+            <div className="check" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+              <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
+                <span onClick={closeModal} style={{ float: 'right', cursor: 'pointer' }}>&times;</span> <br/>
+                <form onSubmit={submitHandler} className='form-c-home' autoComplete='off'>
+                  <div className='form-group-c-home'>
+                    <label>Start Date</label>
+                    <input type='date' name='startDate' value={reservation.startDate} onChange={changeHandler} />
+                  </div>
+                  <div className='form-group-c-home'>
+                    <label>End Date</label>
+                    <input type='date' name='endDate' value={reservation.endDate} onChange={changeHandler} />
+                  </div>
+                  <div className='form-group-c-home'>
+                    <input type='submit' className='btn btn-primary' value={reservation._id && 'Update Reservation Request'} />
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        }
-        <table className='reservations-table'>
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>Room Number</th>
-              <th>Room Type</th>
-              <th>Price</th>
-              <th>Booking Date</th>
-              <th>Status</th>
-              <th>Modify Reservation</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map(reservation => (
-              <tr key={reservation._id}>
-                <td>{reservation.userId}</td>
-                <td>{reservation.roomNumber}</td>
-                <td>{reservation.roomType}</td>
-                <td>${reservation.price}</td>
-                <td>
-                {formatDate(reservation.startDate)} --- {formatDate(reservation.endDate)}
-                  {/* {new Date(reservation.startDate).toLocaleDateString()} 
-                - {new Date(reservation.endDate).toLocaleDateString()} */}
-                </td>
-                <td>{reservation.status}</td>
-                <td>
-                  <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>
-                  &nbsp;
-                  <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Modify Reservation</button>
-                </td>
+          }
+          <table className='reservations-table'>
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Room Number</th>
+                <th>Room Type</th>
+                <th>Price</th>
+                <th>Booking Date (YYYY-MM-DD)</th>
+                <th>Status</th>
+                <th>Modify Reservation</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map(reservation => {
+                const days = calculateDays(reservation.startDate, reservation.endDate);
+                const totalPrice = calculateTotalPrice(days, reservation.price);
+                return (
+                  <tr key={reservation._id}>
+                    <td>{reservation.userId}</td>
+                    <td>{reservation.roomNumber}</td>
+                    <td>{reservation.roomType}</td>
+                    <td>${totalPrice}</td>
+                    <td>
+                    {formatDate(reservation.startDate)} to {formatDate(reservation.endDate)}
+                    </td>
+                    <td>{reservation.status}</td>
+                    <td>
+                      <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>
+                      &nbsp;
+                      <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Modify Reservation</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
       <Footer />
     </div>
