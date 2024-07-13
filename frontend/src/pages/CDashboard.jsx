@@ -129,8 +129,6 @@ const CDashboard = () => {
   const calculateDays = (startDate, endDate) => {
     const start = moment.utc(startDate);
     const end = moment.utc(endDate);
-    console.log("Start: ",start);
-    console.log("End: ",end);
     if(start.isSame(end, 'day')) {
       return 1;
     }

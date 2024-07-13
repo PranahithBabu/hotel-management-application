@@ -43,9 +43,6 @@ const reservationSchema = new mongoose.Schema(
         },
         bookedEndDate: {
             type: Date
-        },
-        totalPrice: {
-            type: Number
         }
     },
     {

@@ -160,7 +160,6 @@ const AHome = () => {
   return (
     <div className='content-a-home'>
       <Header currentPage={currentURL} />
-      {/* <section> */}
       <div className='main-ahome-container'>
         <div className='fixed-element'>
           <div>
@@ -198,9 +197,8 @@ const AHome = () => {
             </form>
             <br/>
           </div>
-
           <div className='cards-container-ahome'>
-            <div className='row'>
+            <div className='row' style={{margin: '10px'}}>
               {data.map(newitem => 
                 <div className='col-md-4' key={newitem._id}>
                   <div class="card" style={{width: "100%", borderColor: newitem.roomMaintenance ? "grey": "green", borderWidth: "5px"}}>
@@ -218,11 +216,9 @@ const AHome = () => {
               )}
             </div>
           </div>
-
         </div>
       </div>
-      {/* </section> */}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   )
 }

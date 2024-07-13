@@ -222,9 +222,8 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
 
-                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                // Calculate the total price
-                const totalPrice = days * roomExist.roomPrice;
+                // const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                // const totalPrice = days * roomExist.roomPrice;
 
                 const overlappingDates = roomExist.unavailableDates.some(date => {
                     const bookedStart = new Date(date.start);
@@ -244,7 +243,7 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                         startDate: startDate,
                         endDate: endDate,
                         price: roomExist.roomPrice,
-                        totalPrice: totalPrice
+                        status: "pending"
                     })
                     await newReservation.save();
 
@@ -313,36 +312,26 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
     try {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
-            const { roomNumber, startDate, endDate } = req.body;
-
+            const { roomNumber, startDate, endDate, status } = req.body;
             if (!startDate || !endDate) {
                 return res.status(400).send({ message: "Start and end dates are required" });
             }
-
             const room = await Room.findOne({ roomNumber });
             if (!room) {
                 return res.status(403).send({ message: "Room does not exist" });
             }
-
             const newStartDate = new Date(startDate);
             const newEndDate = new Date(endDate);
-
-            const days = Math.ceil((newEndDate - newStartDate) / (1000 * 60 * 60 * 24));
-
-            // Calculate the total price
-            const totalPrice = days * room.roomPrice;
-
-            // Check for overlapping dates
+            // const days = Math.ceil((newEndDate - newStartDate) / (1000 * 60 * 60 * 24));
+            // const totalPrice = days * room.roomPrice;
             const isRoomAvailable = room.unavailableDates.every(date => {
                 const existingStartDate = new Date(date.start);
                 const existingEndDate = new Date(date.end);
                 return newEndDate <= existingStartDate || newStartDate >= existingEndDate;
             });
-
             if (!isRoomAvailable) {
                 return res.status(403).send({ message: "Room already booked for the selected dates. Please check for other rooms or dates." });
             }
-
             const newReservation = new Reservation({
                 userId: userId,
                 roomNumber: roomNumber,
@@ -350,18 +339,17 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
                 startDate: startDate,
                 endDate: endDate,
                 price: room.roomPrice,
-                totalPrice: totalPrice
+                status: status
             });
             await newReservation.save();
-
-            // Add new booking to unavailable dates
-            room.unavailableDates.push({
-                start: startDate,
-                end: endDate,
-                roomAvailability: false
-            });
+            if(status && status==="approved"){
+                room.unavailableDates.push({
+                    start: startDate,
+                    end: endDate,
+                    roomAvailability: false
+                });
+            }
             await room.save();
-
             return res.status(200).send({ newReservation, message: "Room booked successfully" });
         } else {
             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
@@ -371,7 +359,6 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
         return res.status(500).send({ message: err.message });
     }
 });
-
 
 app.get('/a/dashboard/:userId', verifyToken, async (req,res) => {
     try{
@@ -405,20 +392,16 @@ app.put('/a/dashboard/:userId', verifyToken, async (req,res) => {
                     ...(endDate && { endDate: new Date(endDate) }),
                     status: status || reservationExist.status
                 })
-                console.log("Res: ",reservationExist);
-                // await updatedReservation.save();
 
                 if(status && status === "approved"){
                     const room = await Room.findOne({ roomNumber: reservationExist.roomNumber });
                     if (room) {
-                        console.log("Before: ",room);
                         await room.unavailableDates.push({
                             start: reservationExist.startDate,
                             end: reservationExist.endDate,
                             roomAvailability: false
                         });
                         await room.save();
-                        console.log("After: ",room);
                     }
                     const updatedBooking = await Reservation.findByIdAndUpdate(_id, {
                         bookedStartDate: startDate,
@@ -456,9 +439,16 @@ app.delete('/a/dashboard/:userId', verifyToken, async (req,res) => {
             const reservationExist = await Reservation.findById(_id);
             const room = await Room.findOne({roomNumber: reservationExist.roomNumber});
             if(reservationExist){
+                if (reservationExist.status === "approved") {
+                    const { startDate, endDate } = reservationExist;
+                    room.unavailableDates = room.unavailableDates.filter(date => {
+                        const existingStartDate = new Date(date.start).toISOString();
+                        const existingEndDate = new Date(date.end).toISOString();
+                        return !(existingStartDate === new Date(startDate).toISOString() && existingEndDate === new Date(endDate).toISOString());
+                    });
+                    await room.save();
+                }
                 let deletedReservation = await Reservation.findByIdAndDelete(_id);
-                room.roomAvailability = true;
-                await room.save();
                 return res.status(200).json({ deletedReservation, message: "Deleted reservation successfully" });
             }else{
                 return res.status(404).json({ message: "Reservation doesnot exist. Or failed to delete" });

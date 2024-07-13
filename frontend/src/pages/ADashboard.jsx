@@ -19,6 +19,7 @@ const ADashboard = () => {
     status: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalEdit, setIsModalEdit] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +62,7 @@ const ADashboard = () => {
   }
 
   const closeModal = () => {
+    setIsModalEdit(false);
     setIsModalOpen(false);
   }
 
@@ -117,6 +119,7 @@ const ADashboard = () => {
       startDate: moment.utc(reservation.startDate).format('YYYY-MM-DD'),
       endDate: moment.utc(reservation.endDate).format('YYYY-MM-DD')
     });
+    setIsModalEdit(true);
     setIsModalOpen(true);
   }
 
@@ -135,6 +138,7 @@ const ADashboard = () => {
     }).then(res => {
       console.log(res);
       setReservation({ _id: '', roomNumber: '', startDate: '', endDate: '', status: ''});
+      setIsModalEdit(false);
       setIsModalOpen(false);
       setData(data.map(item => (item._id === reservation._id ? res.data.updatedReservation : item)))
       window.location.reload();
@@ -183,6 +187,9 @@ const ADashboard = () => {
   const calculateDays = (startDate, endDate) => {
     const start = moment.utc(startDate);
     const end = moment.utc(endDate);
+    if(start.isSame(end, 'day')) {
+      return 1;
+    }
     return end.diff(start, 'days');
   }
 
@@ -191,7 +198,7 @@ const ADashboard = () => {
   }
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header currentPage={currentURL} />
       <div className='content'>
         <div className="reservations-container">
@@ -224,15 +231,17 @@ const ADashboard = () => {
                     <label>End Date</label>
                     <input type='date' name='endDate' value={reservation.endDate} onChange={changeHandler} />
                   </div>
+                  {isModalEdit && 
                   <div className='form-group-a-dashboard'>
+                    <label>Reservation Status</label>
                     <select name='status' value={reservation.status} onChange={changeHandler}>
                       <option value='' disabled>Select Status</option>
+                      <option value='approved'>Approve</option>
                       <option value='pending'>Pending</option>
                       <option value='canceled'>Cancel</option>
                       <option value='rejected'>Reject</option>
-                      <option value='approved'>Approve</option>
                     </select>
-                  </div>
+                  </div> }
                   <div className='form-group-a-dashboard'>
                     <input type='submit' className='btn btn-primary' value={reservation._id ? 'Update Reservation' : 'Confirm Reservation'} />
                   </div>
@@ -256,11 +265,11 @@ const ADashboard = () => {
                 const days = calculateDays(reservation.startDate, reservation.endDate);
                 const totalPrice = calculateTotalPrice(days, reservation.price);
                 return (
-                <tr key={reservation._id} className={`table-row ${reservation.status.toLowerCase()}`} title={reservation.status.toUpperCase()}>
+                <tr key={reservation._id} className={`table-row ${reservation.status}`} title={reservation.status.toUpperCase()}>
                   <td>{reservation.userId}</td>
                   <td>{reservation.roomNumber}</td>
                   <td>{reservation.roomType}</td>
-                  <td>${reservation.totalPrice}</td>
+                  <td>${totalPrice}</td>
                   <td>
                     {formatDate(reservation.startDate)} to {formatDate(reservation.endDate)}
                   </td>
