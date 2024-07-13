@@ -273,6 +273,35 @@ body {
   width: 100%;
 }
 
+
+/* Card maintenance message styling */
+.card {
+  position: relative;
+}
+
+.maintenance-message {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card.maintenance:hover .maintenance-message {
+  display: flex;
+  opacity: 1;
+}
+
 /* Mobile view for Admin home page */
 @media (max-width: 768px) {
   .content-a-home {
@@ -580,10 +609,9 @@ body {
   padding: 20px;
 }
 
-/* Styles for the reservations table */
 .reservations-container {
   width: 100%;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto;
 }
 
 .reservations-table {
@@ -623,6 +651,43 @@ body {
   border: 1px solid blue;
 }
 
+.reservations-table .table-row.approved {
+  background-color: lightgreen;
+}
+
+.reservations-table .table-row.pending {
+  background-color: lightblue;
+}
+
+.reservations-table .table-row.rejected, 
+.reservations-table .table-row.canceled {
+  background-color: lightcoral;
+}
+
+.table-row {
+  position: relative;
+}
+
+.table-row::after {
+  content: attr(title);
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+.table-row:hover::after {
+  opacity: 1;
+}
 
 @media screen and (max-width: 768px) {
   .reservations-container {
@@ -664,33 +729,4 @@ body {
     padding: 10px;
     font-size: 16px;
   }
-}
-
-/* Card maintenance message styling */
-
-.card {
-  position: relative;
-}
-
-.maintenance-message {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: white;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.card.maintenance:hover .maintenance-message {
-  display: flex;
-  opacity: 1;
 }

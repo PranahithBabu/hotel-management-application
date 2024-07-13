@@ -225,8 +225,13 @@ const ADashboard = () => {
                     <input type='date' name='endDate' value={reservation.endDate} onChange={changeHandler} />
                   </div>
                   <div className='form-group-a-dashboard'>
-                    <label>Status</label>
-                    <input type='text' name='status' value={reservation.status} onChange={changeHandler} />
+                    <select name='status' value={reservation.status} onChange={changeHandler}>
+                      <option value='' disabled>Select Status</option>
+                      <option value='pending'>Pending</option>
+                      <option value='canceled'>Cancel</option>
+                      <option value='rejected'>Reject</option>
+                      <option value='approved'>Approve</option>
+                    </select>
                   </div>
                   <div className='form-group-a-dashboard'>
                     <input type='submit' className='btn btn-primary' value={reservation._id ? 'Update Reservation' : 'Confirm Reservation'} />
@@ -243,7 +248,6 @@ const ADashboard = () => {
                 <th>Room Type</th>
                 <th>Price</th>
                 <th>Booking Date (YYYY-MM-DD) </th>
-                <th>Status</th>
                 <th>Modify Reservation</th>
               </tr>
             </thead>
@@ -252,17 +256,16 @@ const ADashboard = () => {
                 const days = calculateDays(reservation.startDate, reservation.endDate);
                 const totalPrice = calculateTotalPrice(days, reservation.price);
                 return (
-                <tr key={reservation._id}>
+                <tr key={reservation._id} className={`table-row ${reservation.status.toLowerCase()}`} title={reservation.status.toUpperCase()}>
                   <td>{reservation.userId}</td>
                   <td>{reservation.roomNumber}</td>
                   <td>{reservation.roomType}</td>
-                  <td>${totalPrice}</td>
+                  <td>${reservation.totalPrice}</td>
                   <td>
                     {formatDate(reservation.startDate)} to {formatDate(reservation.endDate)}
                   </td>
-                  <td>{reservation.status}</td>
                   <td>
-                    <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>
+                    <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Delete Reservation</button>
                     &nbsp;
                     <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Update Reservation</button>
                   </td>

@@ -44,6 +44,18 @@ const CHome = () => {
   const bookRoomBtn = async (roomId) => {
     const [startDate, endDate] = selectedDateRange;
     const room = data.find(room => room._id === roomId);
+    // const start = new Date(startDate);
+    // start.setHours(0, 0, 0, 0);
+    // const end = new Date(endDate);
+    // end.setHours(0, 0, 0, 0);
+
+    // const isRoomAvailable = room.unavailableDates.every(
+    //   range =>
+    //     !(
+    //       !range.roomAvailabilty &&
+    //       (start <= new Date(range.end) && end >= new Date(range.start))
+    //     )
+    // );
     const isRoomAvailable = room.unavailableDates.every(
       range =>
           !(
@@ -51,18 +63,26 @@ const CHome = () => {
             (new Date(startDate) <= new Date(range.end) && new Date(endDate) >= new Date(range.start))
           )
     );
+    // console.log("Start: ",start);
+    // console.log("End: ",end);
     if(isRoomAvailable){
       try {
+        const adjustDate = (date) => {
+          console.log("it is: ",new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0]);
+          return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        };
         const res = await axios.post(`http://localhost:5000${currentURL}`, {
           _id: roomId,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
+          startDate: adjustDate(startDate),
+          endDate: adjustDate(endDate),
         }, {
           headers: {
             'Authorization': localStorage.getItem('token')
           }
         });
-        console.log("Response: ", res); 
+        console.log("Response: ", res);
+        console.log("Start: ",startDate);
+        console.log("End: ",endDate);
         setTimeout(() => {
           alert(res.data.message);
         }, 100);     

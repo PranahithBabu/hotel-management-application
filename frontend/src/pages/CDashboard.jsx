@@ -129,11 +129,16 @@ const CDashboard = () => {
   const calculateDays = (startDate, endDate) => {
     const start = moment.utc(startDate);
     const end = moment.utc(endDate);
+    console.log("Start: ",start);
+    console.log("End: ",end);
+    if(start.isSame(end, 'day')) {
+      return 1;
+    }
     return end.diff(start, 'days');
   }
 
   const calculateTotalPrice = (days, pricePerDay) => {
-    return days * pricePerDay;
+    return (days) * pricePerDay;
   }
 
   return (
@@ -170,7 +175,6 @@ const CDashboard = () => {
                 <th>Room Type</th>
                 <th>Price</th>
                 <th>Booking Date (YYYY-MM-DD)</th>
-                <th>Status</th>
                 <th>Modify Reservation</th>
               </tr>
             </thead>
@@ -179,7 +183,7 @@ const CDashboard = () => {
                 const days = calculateDays(reservation.startDate, reservation.endDate);
                 const totalPrice = calculateTotalPrice(days, reservation.price);
                 return (
-                  <tr key={reservation._id}>
+                  <tr key={reservation._id} className={`table-row ${reservation.status.toLowerCase()}`} title={reservation.status.toUpperCase()}>
                     <td>{reservation.userId}</td>
                     <td>{reservation.roomNumber}</td>
                     <td>{reservation.roomType}</td>
@@ -187,12 +191,16 @@ const CDashboard = () => {
                     <td>
                     {formatDate(reservation.startDate)} to {formatDate(reservation.endDate)}
                     </td>
-                    <td>{reservation.status}</td>
+                    {reservation.status==="approved" ? 
                     <td>
-                      <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Cancel Reservation</button>
-                      &nbsp;
-                      <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Modify Reservation</button>
+                      <b><i> BOOKING APPROVED! </i></b>
                     </td>
+                    :
+                    <td>
+                      <button className='btn btn-danger' onClick={()=>delResBtn(reservation._id)}>Delete Reservation</button>
+                      &nbsp;
+                      <button className='btn btn-warning' onClick={()=>editResBtn(reservation)}>Modify Reservation</button> 
+                    </td> }
                   </tr>
                 );
               })}

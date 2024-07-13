@@ -221,6 +221,11 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
             if (roomExist) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
+
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                // Calculate the total price
+                const totalPrice = days * roomExist.roomPrice;
+
                 const overlappingDates = roomExist.unavailableDates.some(date => {
                     const bookedStart = new Date(date.start);
                     const bookedEnd = new Date(date.end);
@@ -238,7 +243,8 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                         roomType: roomExist.roomType,
                         startDate: startDate,
                         endDate: endDate,
-                        price: roomExist.roomPrice
+                        price: roomExist.roomPrice,
+                        totalPrice: totalPrice
                     })
                     await newReservation.save();
 
@@ -321,6 +327,11 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
             const newStartDate = new Date(startDate);
             const newEndDate = new Date(endDate);
 
+            const days = Math.ceil((newEndDate - newStartDate) / (1000 * 60 * 60 * 24));
+
+            // Calculate the total price
+            const totalPrice = days * room.roomPrice;
+
             // Check for overlapping dates
             const isRoomAvailable = room.unavailableDates.every(date => {
                 const existingStartDate = new Date(date.start);
@@ -338,7 +349,8 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
                 roomType: room.roomType,
                 startDate: startDate,
                 endDate: endDate,
-                price: room.roomPrice
+                price: room.roomPrice,
+                totalPrice: totalPrice
             });
             await newReservation.save();
 
