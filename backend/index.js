@@ -70,7 +70,6 @@ app.post('/register', async(req,res) => {
         const user = await User.create(newUser);
         return res.status(200).send(user);
     }catch(err){
-        console.log("HERE: ",err.message);
         return res.status(500).send({message: err.message});
     }
 });
@@ -180,7 +179,6 @@ app.delete('/a/home/:userId', verifyToken, async (req,res) => {
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id} = req.body;
             const roomExist = await Room.findById(_id);
-            // console.log("IN DELETE: ", roomExist.roomPrice);
             if(roomExist){
                 const deletedRoom = await Room.findByIdAndDelete(_id);
                 return res.status(200).send({ deletedRoom, message: "Deleted Room Successfully" });
@@ -228,13 +226,8 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                 const overlappingDates = roomExist.unavailableDates.some(date => {
                     const bookedStart = new Date(date.start);
                     const bookedEnd = new Date(date.end);
-                    console.log("start: ",start);
-                    console.log("bookedStart: ",bookedStart);
-                    console.log("end: ",end);
-                    console.log("bookedEnd: ",bookedEnd);
                     return !date.roomAvailability && (start <= bookedEnd && end >= bookedStart);
                 });
-                console.log("Bool is: ",overlappingDates);
                 if(!overlappingDates) {
                     const newReservation = new Reservation({
                         userId: userId,

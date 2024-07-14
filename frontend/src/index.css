@@ -276,7 +276,6 @@ body {
   margin-top: calc(40px + 100px);
   width: 100%;
   padding: 20px;
-  /* width: calc(150%); */
 }
 
 /* Card maintenance message styling */
@@ -566,6 +565,13 @@ body {
   padding: 20px;
   padding-bottom: 100px;
   margin-top: 90px;
+}
+
+.reservations-container-cdashboard {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  padding-bottom: 100px;
 }
 
 .reservations-table {
