@@ -206,10 +206,7 @@ const ADashboard = () => {
             <h2>Reservations</h2>
             <input type='button' className='btn btn-primary' value='Make a Reservation' onClick={createResBtn} />
           </div>
-          {isModalOpen && 
-            // <div className="modal">
-            //   <div className="modal-content">
-            //     <span className="close" onClick={closeModal}>&times;</span>
+          {isModalOpen &&
             <div className="check" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
               <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px' }}>
                 <span onClick={closeModal} style={{ float: 'right', cursor: 'pointer' }}>&times;</span> <br/>
@@ -249,6 +246,9 @@ const ADashboard = () => {
               </div>
             </div>
           }
+          {data.length === 0 ? (
+            <p className='no-reservations-message'><a style={{cursor:'pointer', color:'blue'}} onClick={createResBtn}>No Reservations Available. Book one now</a></p>
+          ) : (
           <table className="reservations-table">
             <thead>
               <tr>
@@ -283,7 +283,7 @@ const ADashboard = () => {
               })}
             </tbody>
           </table>
-        </div>
+          )}</div>
       </div>
       <Footer />
     </div>

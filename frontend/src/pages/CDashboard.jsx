@@ -165,6 +165,9 @@ const CDashboard = () => {
               </div>
             </div>
           }
+          {data.length === 0 ? (
+            <p className='no-reservations-message'><a href={currentURL.replace('dashboard','home')}>No Reservations Available. Book one now</a></p>
+          ) : (
           <table className='reservations-table'>
             <thead>
               <tr>
@@ -204,7 +207,7 @@ const CDashboard = () => {
               })}
             </tbody>
           </table>
-        </div>
+          )}</div>
       </div>
       <Footer />
     </div>
