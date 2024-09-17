@@ -41,7 +41,7 @@ const Registration = () => {
     }
     if(check){
         try {
-            await axios.post('${url}/register', {
+            await axios.post(`${url}/register`, {
                 name: data.name,
                 email: data.email,
                 password: data.password,

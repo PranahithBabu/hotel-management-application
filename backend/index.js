@@ -82,7 +82,7 @@ app.post('/login', async(req,res) => {
         }
         const isAdmin = user.isAdmin;
         const token = jwt.sign({user : {id: user.id, email: user.email, isAdmin}}, process.env.JWT_SECRET, 
-            {expiresIn: '1h'}
+            // {expiresIn: '1h'}
         );
         if(isAdmin){
             return res.json({token, redirect: '/a/home', id: user.id});

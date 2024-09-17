@@ -20,7 +20,7 @@ const Login = () => {
   }
   const submitHandler = e => {
     e.preventDefault();
-    axios.post('${url}/login', {
+    axios.post(`${url}/login`, {
       email: data.email,
       password: data.password
     }).then(
