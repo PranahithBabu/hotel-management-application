@@ -5,7 +5,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AHome = () => {
-  const url = "http://localhost:5000";
+  const url = "https://hotel-management-backend-4ptb.onrender.com";
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
