@@ -5,6 +5,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AHome = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
@@ -32,7 +33,7 @@ const AHome = () => {
   }, [room]);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000${currentURL}`,{
+    axios.get(`${url}${currentURL}`,{
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -67,7 +68,7 @@ const AHome = () => {
   const submitHandler = e => {
     e.preventDefault();
     if(isEdit) {
-      axios.put(`http://localhost:5000${currentURL}`, room, {
+      axios.put(`${url}${currentURL}`, room, {
         headers: {
           'Authorization': localStorage.getItem('token')
         }
@@ -83,7 +84,7 @@ const AHome = () => {
       });
     }
     else {
-      axios.post(`http://localhost:5000${currentURL}`, room, {
+      axios.post(`${url}${currentURL}`, room, {
         headers: {
           'Authorization': localStorage.getItem('token')
         }
@@ -126,7 +127,7 @@ const AHome = () => {
   };
 
   const deleteRoomBtn = (_id) => {
-    axios.delete(`http://localhost:5000${currentURL}`,{data:{_id:_id},
+    axios.delete(`${url}${currentURL}`,{data:{_id:_id},
       headers: {
         'Authorization': localStorage.getItem('token')
       }

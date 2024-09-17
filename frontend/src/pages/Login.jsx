@@ -5,6 +5,7 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 
 const Login = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentPage = location.pathname.split('/')[1];
   const [data, setData] = useState({
@@ -19,7 +20,7 @@ const Login = () => {
   }
   const submitHandler = e => {
     e.preventDefault();
-    axios.post('http://localhost:5000/login', {
+    axios.post('${url}/login', {
       email: data.email,
       password: data.password
     }).then(

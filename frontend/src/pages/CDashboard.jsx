@@ -6,6 +6,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 const CDashboard = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
@@ -17,7 +18,7 @@ const CDashboard = () => {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:5000${currentURL}`,{
+    axios.get(`${url}${currentURL}`,{
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -77,7 +78,7 @@ const CDashboard = () => {
       startDate: moment.utc(reservation.startDate).toISOString(),
       endDate: moment.utc(reservation.endDate).toISOString()
     };
-    axios.put(`http://localhost:5000${currentURL}`, updatedReservation, {
+    axios.put(`${url}${currentURL}`, updatedReservation, {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -101,7 +102,7 @@ const CDashboard = () => {
   }
 
   const delResBtn = (_id) => {
-    axios.delete(`http://localhost:5000${currentURL}`, {data: {_id:_id},
+    axios.delete(`${url}${currentURL}`, {data: {_id:_id},
     headers: {
       'Authorization': localStorage.getItem('token')
     }

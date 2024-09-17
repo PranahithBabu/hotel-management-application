@@ -7,6 +7,7 @@ import '../index.css';
 import moment from 'moment';
 
 const ADashboard = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
@@ -24,7 +25,7 @@ const ADashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000${currentURL}`, {
+        const res = await axios.get(`${url}${currentURL}`, {
           headers: {
             'Authorization': localStorage.getItem('token')
           }
@@ -80,7 +81,7 @@ const ADashboard = () => {
       updateReservation(e);
     }
     else {
-      axios.post(`http://localhost:5000${currentURL}`, {
+      axios.post(`${url}${currentURL}`, {
         roomNumber: reservation.roomNumber,
         startDate: reservation.startDate,
         endDate: reservation.endDate
@@ -131,7 +132,7 @@ const ADashboard = () => {
       startDate: moment.utc(reservation.startDate).toISOString(),
       endDate: moment.utc(reservation.endDate).toISOString()
     };
-    axios.put(`http://localhost:5000${currentURL}`, updatedReservation, {
+    axios.put(`${url}${currentURL}`, updatedReservation, {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -158,7 +159,7 @@ const ADashboard = () => {
   }
 
   const delResBtn = (_id) => {
-    axios.delete(`http://localhost:5000${currentURL}`, {data:{_id:_id},
+    axios.delete(`${url}${currentURL}`, {data:{_id:_id},
       headers: {
         'Authorization': localStorage.getItem('token')
       }

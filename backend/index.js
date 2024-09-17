@@ -1,5 +1,4 @@
 import express from 'express';
-import { PORT, mongoDBURL } from './config.js';
 import mongoose from 'mongoose';
 import { User } from './models/userModel.js';
 import { Room } from './models/roomModel.js';
@@ -11,30 +10,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
-// const cors = require('cors')
-// const cors = require('cors');
-
 app.use(cors({}));
-// app.use(
-//     cors({
-//         origin: 'http://localhost:5173',
-//         method: ['GET','POST','PUT','DELETE'],
-//         allowedHeaders: ['Content-Type']
-//     })
-// )
 
-// const corsOptions = {
-//     origin: 'http://localhost:5173', // Allow only the frontend to access
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allowed methods
-//     credentials: true, // Allow cookies to be sent with requests
-//     optionsSuccessStatus: 204 // Some legacy browsers choke on 204
-//   };
-  
-// app.use(cors(corsOptions));
-
-// app.use(express.urlencoded({ extended: true }));
+// app.use(cors({
+//     origin: '*',
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true,
+//   }));
 
 app.get('/', (req,res) => {
     res.status(200).send('In GET');
@@ -96,7 +82,7 @@ app.post('/login', async(req,res) => {
         }
         const isAdmin = user.isAdmin;
         const token = jwt.sign({user : {id: user.id, email: user.email, isAdmin}}, process.env.JWT_SECRET, 
-            // {expiresIn: '1h'}
+            {expiresIn: '1h'}
         );
         if(isAdmin){
             return res.json({token, redirect: '/a/home', id: user.id});
@@ -153,14 +139,11 @@ app.put('/a/home/:userId', verifyToken, async (req,res) => {
         const userId = req.params.userId;
         if (req.user.isAdmin && userId === req.user.id) {
             const {_id, roomNumber, roomType, roomPrice, roomMaintenance} = req.body;
-            // const {roomNumber, roomType, roomPrice, roomAvailability} = req.body;
             const roomExist = await Room.findById(_id);
-            // const roomExist = await Room.findOne(roomNumber);
             if(!roomExist){
                 return res.status(404).send({message:"Room doesnot Exist"});
             }else{
                 const updatedRoom = await Room.findByIdAndUpdate(_id, {roomType, roomPrice, roomMaintenance});
-                // const updatedRoom = await Room.findByIdAndUpdate(roomNumber, {roomType, roomPrice, roomAvailability});
                 updatedRoom.save();
                 return res.status(200).send({updatedRoom, message:"Room Updated Successfully"});
             }
@@ -219,10 +202,6 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
             if (roomExist) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
-
-                // const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                // const totalPrice = days * roomExist.roomPrice;
-
                 const overlappingDates = roomExist.unavailableDates.some(date => {
                     const bookedStart = new Date(date.start);
                     const bookedEnd = new Date(date.end);
@@ -239,9 +218,6 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
                         status: "pending"
                     })
                     await newReservation.save();
-
-                    // roomExist.unavailableDates.push({ start: startDate, end: endDate, roomAvailability: true });
-                    // await roomExist.save();
                     return res.status(200).send({ newReservation, message: "New Reservation Added. Awaiting approval" });
                 }
                 else {
@@ -261,46 +237,6 @@ app.post('/c/home/:userId', verifyToken, async (req,res) => {
 })
 
 // Admin Dashboard Page Requests
-// app.post('/a/dashboard/:userId', verifyToken, async (req,res) => {
-//     try{
-//         const userId = req.params.userId;
-//         if (req.user.isAdmin && userId === req.user.id) {
-//             const {roomNumber, startDate, endDate} = req.body;
-            
-//             if (!startDate || !endDate) {
-//                 return res.status(400).send({ message: "Start and end dates are required" });
-//             }
-
-//             const bookingExist = await Room.findOne({roomNumber});
-//             console.log(bookingExist);
-//             if(!bookingExist){
-//                 return res.status(403).send({message: "Room doesnot exist"});
-//             }
-//             if(bookingExist.roomAvailability){
-//                 const newReservation = new Reservation({
-//                     userId: userId,
-//                     roomNumber: roomNumber,
-//                     roomType: bookingExist.roomType,
-//                     startDate: startDate,
-//                     endDate: endDate,
-//                     price: bookingExist.roomPrice
-//                 })
-//                 await newReservation.save();
-//                 // const updatedAvailability = await Room.findOneAndUpdate({roomNumber: roomNumber}, {roomAvailability: false});
-//                 // await updatedAvailability.save();
-//                 return res.status(200).send({ newReservation, message: "Room booked successfully" });
-//             }else{
-//                 return res.status(403).send({ message: "Room already booked. Please check for other rooms." });
-//             }
-//         } else {
-//             return res.status(403).send({ message: "Access denied. Only admin can access this route or invalid token." });
-//         }
-//     }catch(err){
-//         console.log(err.message);
-//         return res.status(500).send({message: err.message});
-//     }
-// })
-
 app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -315,8 +251,6 @@ app.post('/a/dashboard/:userId', verifyToken, async (req, res) => {
             }
             const newStartDate = new Date(startDate);
             const newEndDate = new Date(endDate);
-            // const days = Math.ceil((newEndDate - newStartDate) / (1000 * 60 * 60 * 24));
-            // const totalPrice = days * room.roomPrice;
             const isRoomAvailable = room.unavailableDates.every(date => {
                 const existingStartDate = new Date(date.start);
                 const existingEndDate = new Date(date.end);
@@ -507,7 +441,6 @@ app.delete('/c/dashboard/:userId', verifyToken, async (req,res) => {
                 return res.status(403).send({message: "Reservation doesnot exist"});
             }
             await Reservation.findByIdAndDelete(_id);
-            // room.roomAvailability = true;
             await room.save();
             return res.status(200).send({message: "Deleted reservation successfully."})
         } else {
@@ -521,7 +454,7 @@ app.delete('/c/dashboard/:userId', verifyToken, async (req,res) => {
 
 try{
     mongoose
-        .connect(mongoDBURL)
+        .connect(process.env.MONGO_DB_URL)
         .then(() => {
             console.log('DB Connected!');
             app.listen(PORT, () => {

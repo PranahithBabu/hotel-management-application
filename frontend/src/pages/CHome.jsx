@@ -6,6 +6,7 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 
 const CHome = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentPage = location.pathname.split('/')[1];
   const currentURL = location.pathname;
@@ -13,7 +14,7 @@ const CHome = () => {
   const [selectedDateRange, setSelectedDateRange] = useState([new Date(), new Date()]);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000${currentURL}`,{
+    axios.get(`${url}${currentURL}`,{
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -71,7 +72,7 @@ const CHome = () => {
           console.log("it is: ",new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0]);
           return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
         };
-        const res = await axios.post(`http://localhost:5000${currentURL}`, {
+        const res = await axios.post(`${url}${currentURL}`, {
           _id: roomId,
           startDate: adjustDate(startDate),
           endDate: adjustDate(endDate),

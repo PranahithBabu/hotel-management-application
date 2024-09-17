@@ -5,6 +5,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const Registration = () => {
+  const url = "http://localhost:5000";
   const location = useLocation();
   const currentPage = location.pathname.split('/')[1];
   const [data, setData] = useState({
@@ -40,7 +41,7 @@ const Registration = () => {
     }
     if(check){
         try {
-            await axios.post('http://localhost:5000/register', {
+            await axios.post('${url}/register', {
                 name: data.name,
                 email: data.email,
                 password: data.password,
