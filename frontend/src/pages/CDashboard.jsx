@@ -6,7 +6,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 const CDashboard = () => {
-  const url = "http://localhost:5000";
+  const url = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);

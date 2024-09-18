@@ -8,6 +8,7 @@ const Header = ({currentPage}) => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   }
+  // console.log("Current Page:", currentPage);
 
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {

@@ -5,7 +5,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const Registration = () => {
-  const url = "http://localhost:5000";
+  const url = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const currentPage = location.pathname.split('/')[1];
   const [data, setData] = useState({
@@ -89,11 +89,6 @@ const Registration = () => {
         <br/>
         Existing customer?
         <Link to='/login'><button className='btn btn-success'>Login</button></Link> &nbsp;
-        {/* <div className='existing-customer-container'>
-          <span>Existing customer? Click here to Login</span> &nbsp;
-          <Link to='/login'><button className='btn btn-success'>Login</button></Link> &nbsp;
-        </div> */}
-        
       </div>
       <Footer />
     </div>

@@ -5,9 +5,10 @@ import { useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AHome = () => {
-  const url = "http://localhost:5000";
+  const url = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const currentURL = location.pathname;
+  // console.log("Debugging: ",currentURL);
   const [data, setData] = useState([]);
   const [room, setRoom] = useState({
     roomNumber: '',

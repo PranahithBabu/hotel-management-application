@@ -6,7 +6,7 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 
 const CHome = () => {
-  const url = "http://localhost:5000";
+  const url = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const currentPage = location.pathname.split('/')[1];
   const currentURL = location.pathname;

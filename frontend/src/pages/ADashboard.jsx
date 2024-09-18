@@ -7,7 +7,8 @@ import '../index.css';
 import moment from 'moment';
 
 const ADashboard = () => {
-  const url = "http://localhost:5000";
+  const url = import.meta.env.VITE_BACKEND_URL;
+  // console.log("URL is: ", url);
   const location = useLocation();
   const currentURL = location.pathname;
   const [data, setData] = useState([]);
