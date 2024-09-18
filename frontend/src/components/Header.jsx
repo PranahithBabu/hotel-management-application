@@ -10,6 +10,8 @@ const Header = ({currentPage}) => {
   }
   // console.log("Current Page:", currentPage);
 
+  // console.log("Current Page:", currentPage);
+
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setIsMenuOpen(false);
